@@ -1,441 +1,293 @@
-# MRT
+<p align="center">
+  <img src="assets/mrt-logo.svg" alt="MRT Programming Language" width="380">
+</p>
 
-MRT is a small programming language implemented from scratch in C.
+<p align="center">
+  <strong>MRT Programming Language & MRT Studio IDE</strong><br>
+  A modern, lightweight programming language and native Linux IDE crafted from scratch in pure C.
+</p>
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](#building)
-[![Language](https://img.shields.io/badge/language-C11%20%2F%20C17-blue)](#building)
-[![Standard](https://img.shields.io/badge/standard%20library-only-orange)](#overview)
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+<p align="center">
+  <a href="#english">English</a> • <a href="#türkçe">Türkçe</a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/MRT-v0.2.0-blue.svg" alt="MRT Version">
+  <img src="https://img.shields.io/badge/MRT%20Studio-v0.2.0-orange.svg" alt="MRT Studio Version">
+  <img src="https://img.shields.io/badge/Language-C11%20%2F%20C17-00599C.svg" alt="Language C11/C17">
+  <img src="https://img.shields.io/badge/GUI-GTK4%20%2B%20GtkSourceView%205-4B8BBE.svg" alt="GTK4">
+  <img src="https://img.shields.io/badge/Tests-14%2F14%20Passing-brightgreen.svg" alt="Tests Passing">
+  <img src="https://img.shields.io/badge/Memory-0%20Leaks%20(ASan%2FLSan)-success.svg" alt="Memory Safe">
+  <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License MIT">
+</p>
 
 ---
+
+<a name="english"></a>
+# English
 
 ## Overview
 
-**MRT** is a modern, clean, dynamically typed scripting language designed and implemented entirely from scratch in standard C (C11/C17). It uses zero third-party dependencies, parsers, or lexer generators (no Flex or Bison).
+**MRT** is a lightweight, dynamically typed programming language designed and implemented entirely from scratch in standard C (C11/C17). It uses **zero third-party parser generators** (no Flex or Bison) and relies exclusively on standard C library primitives.
 
-All source files in MRT use the **`.mrt`** extension:
+Alongside the language runtime, **MRT Studio** is a native, modern, bilingual (English & Turkish) Linux IDE built with **GTK4** and **GtkSourceView 5**. MRT Studio avoids webview/Electron bloat and delivers an ultra-fast, responsive developer experience.
 
-```text
-main.mrt
-hello.mrt
-factorial.mrt
+Source files use the **`.mrt`** extension.
+
+```bash
+mrt main.mrt
 ```
-
-The executable name is `mrt`.
 
 ---
 
-## Features
+## MRT 0.2.0 Language Identity
 
-- **Standard C (C11/C17)**: Fully portable implementation using only the C standard library.
-- **Hand-written Frontend**: Recursive descent parser with precedence climbing and clean lexical analysis.
-- **Decoupled Architecture**: Strict separation between the Frontend (Lexer, Parser, AST) and Runtime (Interpreter, Environment, Value system). Ready for future Bytecode VM and C transpile backends.
-- **Dynamic Typing**: Native support for `integer`, `float`, `string`, `boolean`, `null`, and `function`.
-- **First-Class Functions & Recursion**: Function declarations (`fn`), closures, nested scopes, parameter binding, and tail/nested recursion.
-- **Lexical Scoping**: Deterministic environment hierarchy with parent pointer chains.
-- **Quality Error Diagnostics**: GCC/Rust-style source code context with line numbers, column numbers, and visual caret (`^`) pointers.
-- **Interactive REPL**: Interactive shell with statement and persistent expression evaluation.
-- **Debug Inspection**: Built-in CLI flags to inspect token streams (`--tokens`) and abstract syntax trees (`--ast`).
-- **Memory Safety**: Deterministic reference-counted object management verified under AddressSanitizer and LeakSanitizer for **0 bytes memory leaks**.
+MRT features its own distinctive, clean syntax:
+
+* **Variable Bindings:** `var name = "Murat"`
+* **Tasks (Functions):** `task add(a, b) { give a + b }`
+* **Return Values:** `give result`
+* **Output Statement:** `say "Hello, MRT!"` (`say <expr>` keyword statement, no parentheses required)
+* **Conditional Logic:** `when (condition) { ... } otherwise when (...) { ... } otherwise { ... }`
+* **Loops & Control Flow:** `repeat (counter < 10) { ... }`, with `break` and `continue`
+* **Literals:** `yes` (true), `no` (false), `none` (null / void)
+* **Comments:** `// single-line` and `/* multi-line block */`
+* **Standard Builtins:** `typeOf(v)`, `length(s)`, `toText(v)`, `clock()`
+
+### Example Code
+
+```mrt
+// fibonacci.mrt - MRT 0.2.0
+task fib(n) {
+    when n <= 1 {
+        give n
+    }
+    give fib(n - 1) + fib(n - 2)
+}
+
+var i = 0
+repeat i <= 10 {
+    say "fib(" + toText(i) + ") = " + toText(fib(i))
+    i = i + 1
+}
+```
+
+---
+
+## MRT Studio IDE
+
+<p align="center">
+  <img src="assets/mrt-studio-logo.svg" alt="MRT Studio Logo" width="340">
+</p>
+
+**MRT Studio** is a tailored development environment for MRT:
+
+* **Bilingual Localization (TR & EN):** Native GNU gettext binding with an embedded dictionary fallback—ensures seamless Turkish and English translation even if system locales are missing.
+* **Branded Welcome Screen:** Clean project dashboard with quick actions (New Project, Open Folder, Open File) and recent projects history.
+* **Productivity Tools:**
+  * **Command Palette (`Ctrl+Shift+P`):** Searchable access to all IDE actions.
+  * **Quick Open (`Ctrl+P`):** Fast file fuzzy navigation across the active project.
+  * **Find in Files (`Ctrl+Shift+F`):** Search project sources and jump directly to matches.
+  * **Go to Line (`Ctrl+G`):** Direct line navigation dialog.
+  * **Symbol Outline:** Sidebar tree inspecting all `task` and `var` symbols in the active buffer.
+  * **Problems & Diagnostics Panel:** Automatically extracts runtime and compiler errors with file, line, and column clickable jumps.
+  * **Status Bar:** Real-time display of cursor position (`Ln X, Col Y`), indentation settings, file encoding, and MRT version.
+  * **Session Persistence & Crash Recovery:** Restores previous workspace tabs; periodically autosaves dirty buffers to `~/.local/state/mrt-studio/recovery/` with crash restoration prompts.
+  * **Project Wizard:** Project creation templates (*Console Application*, *Empty Project*, *Library*) with `mrt.project` manifest support.
 
 ---
 
 ## Architecture
 
-The project is structured with an extensible pipeline:
+MRT is built with a strictly decoupled pipeline:
 
 ```text
 MRT Source (.mrt)
         ↓
-    [ Lexer ]
+    [ Lexer ]          --> Hand-written scanner & token stream (src/token.c, src/lexer.c)
         ↓ Tokens
-    [ Parser ]
-        ↓ AST  <--- Decoupled Frontend Boundary
-  [ AST Interpreter ]
+    [ Parser ]         --> Recursive-descent & precedence climbing (src/parser.c)
+        ↓ AST          <-- Clean Frontend Boundary
+  [ AST Interpreter ]  --> Environment scope hierarchy & tagged union values (src/interpreter.c)
         ↓
      Output
 ```
 
-The AST representation is independent of runtime details. Future releases will plug in:
-1. **Bytecode Compiler & VM**: `AST -> Bytecode -> MRT VM`
-2. **C Backend**: `AST -> Generated C -> GCC / Clang -> Native Binary`
+* **Frontend**: Independent from execution details; ready for future Bytecode VM and C transpile targets.
+* **Memory Safety**: Reference-counted runtime with AddressSanitizer (ASan) and LeakSanitizer (LSan) validation (0 leaks).
 
 ---
 
-## Project Structure
+## Building and Running
 
-```text
-mrt/
-├── src/
-│   ├── common.h         # Memory wrappers and common utilities
-│   ├── version.h        # Central version definition (MRT 0.1.0)
-│   ├── token.h          # Token types and structures
-│   ├── token.c          # Token printers and constructors
-│   ├── error.h          # Diagnostic error reporting interface
-│   ├── error.c          # Caret positioning and error formatting
-│   ├── lexer.h          # Hand-crafted lexer interface
-│   ├── lexer.c          # Scanner for MRT grammar and literals
-│   ├── ast.h            # Abstract Syntax Tree nodes and definitions
-│   ├── ast.c            # AST construction, freeing, and tree printer
-│   ├── parser.h         # Recursive-descent parser interface
-│   ├── parser.c         # Operator precedence parser & sync recovery
-│   ├── value.h          # Tagged union Value system & string management
-│   ├── value.c          # Value operations and memory retain/release
-│   ├── environment.h    # Lexical scope symbol table interface
-│   ├── environment.c    # Hash table scope implementation
-│   ├── builtin.h        # Standard builtins (print, typeof, len, str)
-│   ├── builtin.c        # Builtin function implementations
-│   ├── interpreter.h    # AST tree-walking interpreter
-│   ├── interpreter.c    # Evaluation engine & expression evaluation
-│   └── main.c           # CLI entry point, argument parsing & REPL
-├── tests/
-│   └── test_main.c      # Automated test runner and test cases
-├── examples/
-│   ├── hello.mrt        # Basic printing example
-│   ├── variables.mrt    # Types and variable declarations
-│   ├── conditions.mrt   # If / else branches and comparisons
-│   ├── loops.mrt        # While loop example
-│   ├── functions.mrt    # Function definitions and scoping
-│   └── factorial.mrt    # Recursive factorial calculation
-├── docs/
-│   ├── architecture.md  # Architectural overview and design principles
-│   └── reference.md     # Language syntax and builtin reference
-├── Makefile             # Build automation
-├── README.md            # Project documentation
-└── LICENSE              # MIT License
-```
-
----
-
-## Building
-
-### Requirements
-- GCC (11+) or Clang (13+)
-- GNU Make
-- Linux (Ubuntu, Debian, Fedora, Arch, etc.)
+### Prerequisites
+* GCC (11+) or Clang (13+)
+* GNU Make
+* GTK4 & GtkSourceView 5 (bundled under `mrt-studio/deps` for out-of-the-box building)
 
 ### Build Targets
 
-Build release binary with `-O2`:
 ```bash
+# Compile MRT language CLI
 make
-```
 
-Build debug binary with AddressSanitizer and UndefinedBehaviorSanitizer:
-```bash
-make debug
-```
-
-Run test suite:
-```bash
+# Run the automated test suite (AddressSanitizer enabled)
 make test
+
+# Compile MRT Studio IDE
+make studio
+
+# Launch MRT Studio
+./mrt-studio/mrt-studio
+
+# Run an MRT script directly
+./mrt examples/factorial.mrt
 ```
 
-Run sample program:
+### Installation
+
 ```bash
-make run
+cd mrt-studio
+sudo make install
 ```
 
-Clean build artifacts:
+Installs `mrt-studio` binary, desktop entry (`mrt-studio.desktop`), MIME type association (`mrt.xml` for `*.mrt`), AppStream metadata, and icons to `/usr/local`.
+
+---
+
+<br>
+<hr>
+<br>
+
+<a name="türkçe"></a>
+# Türkçe
+
+## Genel Bakış
+
+**MRT**, standart C (C11/C17) diliyle hiçbir harici parser oluşturucu (Flex, Bison vb.) kullanılmadan, tamamen sıfırdan geliştirilmiş modern ve dinamik tipli bir programlama dilidir. Yalnızca standart C kütüphanesini kullanır.
+
+Dilin yanı sıra **MRT Studio**, Linux için **GTK4** ve **GtkSourceView 5** teknolojileriyle geliştirilmiş, hafif ve çift dilli (Türkçe & İngilizce) yerel bir tümleşik geliştirme ortamıdır (IDE). Electron veya webview gibi ağır framework'ler içermez; doğrudan yerel ikili kod olarak çalışır.
+
+MRT kaynak dosyaları **`.mrt`** uzantısını kullanır:
+
 ```bash
-make clean
+mrt ana.mrt
 ```
 
 ---
 
-## Usage
+## MRT 0.2.0 Dil Kimliği
 
-### Run a `.mrt` File
+MRT 0.2.0 sürümü ile birlikte dile özgün ve akıcı bir kimlik kazandırılmıştır:
 
-```bash
-./mrt examples/hello.mrt
-```
+* **Değişken Tanımlama:** `var isim = "Murat"`
+* **Görevler (Fonksiyonlar):** `task topla(a, b) { give a + b }`
+* **Değer Döndürme:** `give sonuc`
+* **Konsol Çıktısı:** `say "Merhaba Dünya!"` (`say <ifade>` deyimi, parantez zorunluluğu yoktur)
+* **Koşul İfadeleri:** `when (durum) { ... } otherwise when (...) { ... } otherwise { ... }`
+* **Döngüler:** `repeat (sayac < 10) { ... }`, `break` ve `continue` destekli
+* **Değer Sabitleri:** `yes` (doğru), `no` (yanlış), `none` (boş/yokluk)
+* **Yorum Satırları:** `// tek satır` ve `/* çok satırlı blok */`
+* **Yerleşik İşlevler:** `typeOf(d)`, `length(metin)`, `toText(d)`, `clock()`
 
-### Interactive REPL
-
-Start the REPL by running `mrt` without arguments:
-
-```bash
-$ ./mrt
-MRT 0.1.0
-Interactive interpreter
-
->>> let x = 10
->>> x + 5
-15
->>> print("Merhaba")
-Merhaba
-```
-
-### CLI Options
-
-Display version:
-```bash
-./mrt --version
-# MRT 0.1.0
-```
-
-Display help:
-```bash
-./mrt --help
-```
-
-Dump Token Stream:
-```bash
-./mrt --tokens examples/factorial.mrt
-```
-
-Dump Abstract Syntax Tree:
-```bash
-./mrt --ast examples/factorial.mrt
-```
-
-Example AST output:
-```text
-Program
-├── FunctionDecl(factorial(n))
-│   └── Block
-│       ├── IfStmt
-│       │   ├── BinaryExpr(<=)
-│       │   │   ├── Identifier(n)
-│       │   │   └── Integer(1)
-│       │   └── Block
-│       │       └── ReturnStmt
-│       │           └── Integer(1)
-│       └── ReturnStmt
-│           └── BinaryExpr(*)
-│               ├── Identifier(n)
-│               └── CallExpr
-│                   ├── Identifier(factorial)
-│                   └── BinaryExpr(-)
-│                       ├── Identifier(n)
-│                       └── Integer(1)
-└── ExprStmt
-    └── CallExpr
-        ├── Identifier(print)
-        └── CallExpr
-            ├── Identifier(factorial)
-            └── Integer(5)
-```
-
----
-
-## Language Syntax
-
-### Data Types
-
-| Type | Examples | Description |
-|---|---|---|
-| `integer` | `10`, `-42`, `0` | 64-bit signed integer |
-| `float` | `3.14`, `-0.5` | Double-precision floating point |
-| `string` | `"Murat"`, `"Selam\n"` | Character sequence with escape sequences (`\n`, `\t`, `\"`, `\\`) |
-| `boolean` | `true`, `false` | Boolean truth values |
-| `null` | `null` | Absence of value |
-| `function`| `fn (a, b) { ... }`| First-class callable routines |
-
-### Variables & Assignment
-
-Variables are defined with `let` and can be assigned new values:
+### Örnek Kod
 
 ```mrt
-let x = 10
-x = 20
-```
-
-Statement terminators can be newlines or semicolons:
-```mrt
-let a = 1; let b = 2;
-```
-
-### Arithmetic Operators
-
-Supports standard precedence (`*`, `/`, `%` bind tighter than `+`, `-`):
-
-```mrt
-let x = 10 + 5 * 2   // Evaluates to 20
-let y = (10 + 5) * 2 // Evaluates to 30
-let m = 14 % 4       // Evaluates to 2
-```
-
-### Comparisons
-
-```mrt
-==    !=    <    <=    >    >=
-```
-
-### Boolean Logic
-
-Keywords `and`, `or`, and `not` with short-circuit evaluation:
-
-```mrt
-if yas >= 18 and aktif {
-    print("Giriş izni var")
-}
-```
-
-### String Concatenation
-
-Use `+` to concatenate strings:
-
-```mrt
-let isim = "Murat"
-print("Merhaba " + isim)
-```
-
-### Control Flow
-
-#### If / Else
-
-```mrt
-if yas >= 18 {
-    print("Yetişkin")
-} else {
-    print("Çocuk")
-}
-```
-
-Nested and `else if` chains are fully supported:
-```mrt
-if puan >= 90 {
-    print("A")
-} else if puan >= 80 {
-    print("B")
-} else {
-    print("C")
-}
-```
-
-#### While Loops
-
-```mrt
-let i = 0
-while i < 10 {
-    print(i)
-    i = i + 1
-}
-```
-
-### Functions & Scoping
-
-Functions are declared with `fn` and support lexical scoping, local variables, parameters, and recursion:
-
-```mrt
-fn topla(a, b) {
-    return a + b
-}
-
-let sonuc = topla(10, 20)
-print(sonuc)
-```
-
-Recursion:
-
-```mrt
-fn faktoriyel(n) {
-    if n <= 1 {
-        return 1
+// faktoriyel.mrt - MRT 0.2.0
+task faktoriyel(n) {
+    when n <= 1 {
+        give 1
     }
-    return n * faktoriyel(n - 1)
+    give n * faktoriyel(n - 1)
 }
 
-print(faktoriyel(5)) // Prints 120
+var sayi = 5
+say toText(sayi) + "! = " + toText(faktoriyel(sayi))
 ```
-
-### Lexical Scope
-
-```mrt
-let x = 10
-
-fn test() {
-    let x = 20
-    print(x) // Prints 20
-}
-
-test()
-print(x)     // Prints 10
-```
-
-### Built-in Functions
-
-- `print(...)`: Prints values separated by spaces to standard output.
-- `typeof(x)`: Returns the type name as string (`"integer"`, `"float"`, `"string"`, `"boolean"`, `"null"`, `"function"`).
-- `len(x)`: Returns the length of a string.
-- `str(x)`: Converts a value to its string representation.
-- `clock()`: Returns elapsed execution time in seconds.
 
 ---
 
-## Testing
+## MRT Studio IDE
 
-The project includes an automated test runner in `tests/test_main.c`:
+<p align="center">
+  <img src="assets/mrt-studio-logo.svg" alt="MRT Studio Logo" width="340">
+</p>
+
+MRT için özel olarak geliştirilen **MRT Studio**:
+
+* **Çift Dilli Destek (Türkçe & İngilizce):** GNU gettext altyapısı ve dahili sözlük yedeği ile sistemde Türkçe yerel ayar olmasa bile eksiksiz Türkçe arayüz.
+* **Markalı Karşılama Ekranı:** Açılışta ve sekme yokken gösterilen; Yeni Proje, Proje Aç, Dosya Aç butonları ve Son Projeler listesi.
+* **Üretkenlik Özellikleri:**
+  * **Komut Paleti (`Ctrl+Shift+P`):** Tüm IDE işlevlerine hızlı erişim.
+  * **Hızlı Dosya Aç (`Ctrl+P`):** Proje dosyaları arasında anında arama ve açma.
+  * **Dosyalarda Bul (`Ctrl+Shift+F`):** Proje genelinde kod arama ve satıra doğrudan atlama.
+  * **Satıra Git (`Ctrl+G`):** İstenen satıra navigasyon kutusu.
+  * **Sembol Ağacı (Outline):** Dosyadaki `task` ve `var` tanımlarını listeleyen kenar çubuğu.
+  * **Sorunlar ve Hata Paneli:** Derleme ve çalışma zamanı hatalarını ayrıştırıp tıklanabilir bağlantılarla hata satırına odaklanma.
+  * **Durum Çubuğu:** İmleç konumu (`Ln X, Col Y`), girinti türü, kodlama ve MRT sürümü bilgisi.
+  * **Oturum ve Çökme Kurtarma:** Açık sekmeleri hatırlama, 15 saniyede bir otomatik yedekleme ve kurtarma bildirimi.
+  * **Yeni Proje Sihirbazı:** *Konsol Uygulaması*, *Boş Proje* ve *Kütüphane* şablonları (`mrt.project` manifesti ile).
+
+---
+
+## Mimari
+
+MRT, modüler ve genişletilebilir bir mimariye sahiptir:
+
+```text
+MRT Kaynak Kodu (.mrt)
+          ↓
+     [ Lexer ]          --> Karakter tarama ve token üretimi (src/token.c, src/lexer.c)
+          ↓ Tokenlar
+     [ Parser ]         --> Recursive-descent & öncelik tırmanışı (src/parser.c)
+          ↓ AST          <-- Frontend Sınırı
+  [ AST Yorumlayıcı ]   --> Kapsam zinciri ve dinamik değer sistemi (src/interpreter.c)
+          ↓
+        Çıktı
+```
+
+* **Ayrık Mimari**: AST yapısı çalışma zamanından bağımsızdır; gelecekteki Bytecode VM ve C derleme hedeflerine doğrudan bağlanabilir.
+* **Bellek Güvenliği**: Referans sayımı ve AddressSanitizer/LeakSanitizer testleri ile **0 bellek sızıntısı**.
+
+---
+
+## Derleme ve Çalıştırma
+
+### Gereksinimler
+* GCC (11+) veya Clang (13+)
+* GNU Make
+* GTK4 & GtkSourceView 5 (`mrt-studio/deps` altında paketlenmiş olarak hazırdır)
+
+### Derleme Komutları
 
 ```bash
+# MRT dil yorumlayıcısını derle
+make
+
+# Otomatik test paketini çalıştır (AddressSanitizer devrede)
 make test
+
+# MRT Studio IDE'sini derle
+make studio
+
+# MRT Studio'yu çalıştır
+./mrt-studio/mrt-studio
+
+# Bir MRT dosyasını komut satırından çalıştır
+./mrt examples/conditions.mrt
 ```
 
-Tests cover:
-- Lexer tokenization & escapes
-- Numbers (int & float)
-- Strings & concatenation
-- Operators & precedence climbing
-- Variable declarations & assignments
-- Boolean logic & short-circuit evaluation
-- Lexical scoping & variable shadowing
-- Functions, arguments & returns
-- Deep recursion (Factorial, Fibonacci)
-- Control flow (`if`, `else`, `while`)
-- Builtin functions
-- Error handling (`SyntaxError`, `NameError`, `TypeError`, `RuntimeError`)
-- Memory leak detection via AddressSanitizer and LeakSanitizer
+### Sisteme Kurulum
+
+```bash
+cd mrt-studio
+sudo make install
+```
+
+`mrt-studio` ikili dosyasını, masaüstü kısayolunu (`mrt-studio.desktop`), dosya türü tanımını (`mrt.xml`), AppStream üstverisini ve simgeleri `/usr/local` dizinine kurar.
 
 ---
 
-## Roadmap
+## Lisans
 
-### MRT 0.2
-- [ ] Arrays and dynamic lists (`[1, 2, 3]`)
-- [ ] Maps / Dictionaries (`{ "key": value }`)
-- [ ] `for` loops (`for item in list`)
-- [ ] `break` and `continue` statements
-- [ ] Import and module system (`import math`)
-
-### MRT 0.3
-- [ ] Bytecode compiler:
-  ```text
-  MRT Source -> Lexer -> Parser -> AST -> Bytecode Compiler -> MRT VM
-  ```
-- [ ] Stack-based Virtual Machine
-- [ ] Disassembler tools (`--disasm`)
-
-### MRT 0.4
-- [ ] C Backend:
-  ```text
-  MRT -> AST -> Generated C -> GCC / Clang -> Native Binary
-  ```
-- [ ] Standalone native compilation
-
-### Future
-- [ ] Mark-and-sweep Garbage Collector
-- [ ] Standard library extensions (Filesystem, Math, Regex, Net)
-- [ ] Language Server Protocol (LSP) implementation
-- [ ] Source formatter & Syntax highlighter
-- [ ] Interactive source debugger
-
----
-
-## Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository.
-2. Create your feature branch (`git checkout -b feature/my-feature`).
-3. Ensure all tests pass under `make test` with zero warnings and zero memory leaks.
-4. Commit your changes (`git commit -am 'Add new feature'`).
-5. Push to the branch (`git push origin feature/my-feature`).
-6. Create a new Pull Request.
-
----
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Bu proje [MIT Lisansı](LICENSE) ile lisanslanmıştır.
