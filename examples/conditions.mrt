@@ -1,0 +1,18 @@
+// conditions.mrt
+let yas = 22
+let aktif = true
+
+if yas >= 18 and aktif {
+    print("Yetişkin ve aktif kullanıcı")
+} else {
+    print("Giriş izni yok")
+}
+
+let puan = 85
+if puan >= 90 {
+    print("Derece: A")
+} else if puan >= 80 {
+    print("Derece: B")
+} else {
+    print("Derece: C")
+}

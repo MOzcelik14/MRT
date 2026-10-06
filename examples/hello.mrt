@@ -1,0 +1,3 @@
+// hello.mrt
+let mesaj = "Merhaba Dünya!"
+print(mesaj)

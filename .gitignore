@@ -1,0 +1,10 @@
+# Build artifacts
+mrt
+bin/
+obj/
+*.o
+*.dSYM/
+
+# Temporary files
+*.tmp
+*~

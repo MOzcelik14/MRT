@@ -1,0 +1,17 @@
+// functions.mrt
+fn topla(a, b) {
+    return a + b
+}
+
+let sonuc = topla(10, 20)
+print("10 + 20 =", sonuc)
+
+// Lexical scope test
+let x = 10
+fn test() {
+    let x = 20
+    print("test içi x:", x)
+}
+
+test()
+print("test dışı x:", x)

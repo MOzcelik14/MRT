@@ -1,0 +1,10 @@
+// loops.mrt
+let i = 0
+let toplam = 0
+
+while i < 10 {
+    toplam = toplam + i
+    i = i + 1
+}
+
+print("0'dan 9'a kadar toplam:", toplam)

@@ -1,0 +1,18 @@
+// variables.mrt
+let yas = 22
+let oran = 3.14
+let isim = "Murat"
+let aktif = true
+let bos = null
+
+print("İsim:", isim)
+print("Yaş:", yas)
+print("Oran:", oran)
+print("Aktif:", aktif)
+print("Boş:", bos)
+
+print("typeof(yas):", typeof(yas))
+print("typeof(oran):", typeof(oran))
+print("typeof(isim):", typeof(isim))
+print("typeof(aktif):", typeof(aktif))
+print("typeof(bos):", typeof(bos))
