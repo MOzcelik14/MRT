@@ -1,0 +1,8 @@
+# Build artifacts
+mrt-studio
+obj/
+*.o
+*.dSYM/
+*~
+deps/
+*.deb

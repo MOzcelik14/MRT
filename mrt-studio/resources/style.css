@@ -1,0 +1,33 @@
+/* MRT Studio Style Sheet */
+
+.output-console {
+    font-family: monospace;
+    font-size: 10pt;
+    padding: 6px;
+}
+
+.output-stdout {
+    color: inherit;
+}
+
+.output-stderr {
+    color: #e05555;
+    font-weight: bold;
+}
+
+.output-link {
+    color: #3584e4;
+    text-decoration: underline;
+}
+
+.project-sidebar {
+    background-color: alpha(currentColor, 0.02);
+}
+
+.project-sidebar treeview {
+    font-size: 9.5pt;
+}
+
+.editor-dirty {
+    font-style: italic;
+}

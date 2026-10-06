@@ -53,5 +53,9 @@ test: $(OBJS)
 run: $(TARGET)
 	./$(TARGET) examples/hello.mrt
 
+studio: $(TARGET)
+	$(MAKE) -C mrt-studio
+
 clean:
 	rm -rf $(OBJ_DIR) $(BIN_DIR) $(TARGET)
+	$(MAKE) -C mrt-studio clean
