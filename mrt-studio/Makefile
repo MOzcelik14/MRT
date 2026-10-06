@@ -89,14 +89,16 @@ install: $(TARGET)
 	install -m 644 io.mrt_lang.studio.metainfo.xml $(DESTDIR)$(PREFIX)/share/metainfo/
 	install -d $(DESTDIR)$(PREFIX)/share/locale/tr/LC_MESSAGES
 	install -d $(DESTDIR)$(PREFIX)/share/locale/en/LC_MESSAGES
+	install -d $(DESTDIR)$(PREFIX)/share/gtksourceview-5/language-specs
+	install -m 644 data/mrt.lang $(DESTDIR)$(PREFIX)/share/gtksourceview-5/language-specs/
 	if [ -f locale/tr/LC_MESSAGES/mrt-studio.mo ]; then \
 		install -m 644 locale/tr/LC_MESSAGES/mrt-studio.mo $(DESTDIR)$(PREFIX)/share/locale/tr/LC_MESSAGES/; \
 	fi
 	if [ -f locale/en/LC_MESSAGES/mrt-studio.mo ]; then \
 		install -m 644 locale/en/LC_MESSAGES/mrt-studio.mo $(DESTDIR)$(PREFIX)/share/locale/en/LC_MESSAGES/; \
 	fi
-	@which update-desktop-database >/dev/null 2>&1 && update-desktop-database || true
-	@which update-mime-database >/dev/null 2>&1 && update-mime-database $(DESTDIR)$(PREFIX)/share/mime || true
+	@which update-desktop-database >/dev/null 2>&1 && update-desktop-database $(DESTDIR)$(PREFIX)/share/applications 2>/dev/null || true
+	@which update-mime-database >/dev/null 2>&1 && update-mime-database $(DESTDIR)$(PREFIX)/share/mime 2>/dev/null || true
 
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/bin/$(TARGET)

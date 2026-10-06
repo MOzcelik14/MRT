@@ -27,7 +27,9 @@ TEST_SRCS = $(TEST_DIR)/test_main.c
 OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 MAIN_OBJ = $(OBJ_DIR)/main.o
 
-.PHONY: all clean test debug run
+PREFIX ?= $(HOME)/.local
+
+.PHONY: all clean test debug run studio install uninstall
 
 all: $(TARGET)
 
@@ -55,6 +57,15 @@ run: $(TARGET)
 
 studio: $(TARGET)
 	$(MAKE) -C mrt-studio
+
+install: $(TARGET) studio
+	install -d $(DESTDIR)$(PREFIX)/bin
+	install -m 755 $(TARGET) $(DESTDIR)$(PREFIX)/bin/
+	$(MAKE) -C mrt-studio install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
+
+uninstall:
+	rm -f $(DESTDIR)$(PREFIX)/bin/$(TARGET)
+	$(MAKE) -C mrt-studio uninstall PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 
 clean:
 	rm -rf $(OBJ_DIR) $(BIN_DIR) $(TARGET)
