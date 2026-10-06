@@ -8,12 +8,13 @@
 </p>
 
 <p align="center">
-  <a href="#english">English</a> • <a href="#türkçe">Türkçe</a>
+  <a href="#english">English</a> • <a href="#türkçe">Türkçe</a> • <a href="MRT_El_Kitabi.pdf"><strong>📄 PDF El Kitabı / Handbook</strong></a>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/MRT-v0.2.0-blue.svg" alt="MRT Version">
   <img src="https://img.shields.io/badge/MRT%20Studio-v0.2.0-orange.svg" alt="MRT Studio Version">
+  <img src="https://img.shields.io/badge/Docs-PDF%20Handbook-purple.svg" alt="PDF Handbook">
   <img src="https://img.shields.io/badge/Language-C11%20%2F%20C17-00599C.svg" alt="Language C11/C17">
   <img src="https://img.shields.io/badge/GUI-GTK4%20%2B%20GtkSourceView%205-4B8BBE.svg" alt="GTK4">
   <img src="https://img.shields.io/badge/Tests-14%2F14%20Passing-brightgreen.svg" alt="Tests Passing">
@@ -147,11 +148,21 @@ make studio
 ### Installation
 
 ```bash
-cd mrt-studio
-sudo make install
+# Install to ~/.local (no root required)
+make install PREFIX=~/.local
+
+# Or install system-wide
+sudo make install PREFIX=/usr/local
 ```
 
-Installs `mrt-studio` binary, desktop entry (`mrt-studio.desktop`), MIME type association (`mrt.xml` for `*.mrt`), AppStream metadata, and icons to `/usr/local`.
+Installs `mrt` and `mrt-studio` binaries, desktop entry (`mrt-studio.desktop`), MIME type association (`mrt.xml` for `*.mrt`), AppStream metadata, syntax highlighting (`mrt.lang`), and icons.
+
+---
+
+## Handbook & Documentation
+
+A comprehensive, 15-page publication-ready PDF reference handbook is available:
+* 📄 **[MRT_El_Kitabi.pdf](MRT_El_Kitabi.pdf)** (Complete language and IDE manual)
 
 ---
 
@@ -280,11 +291,21 @@ make studio
 ### Sisteme Kurulum
 
 ```bash
-cd mrt-studio
-sudo make install
+# Kullanıcı düzeyinde (~/.local) kurulum (root gerekmez)
+make install PREFIX=~/.local
+
+# Veya sistem geneline kurulum
+sudo make install PREFIX=/usr/local
 ```
 
-`mrt-studio` ikili dosyasını, masaüstü kısayolunu (`mrt-studio.desktop`), dosya türü tanımını (`mrt.xml`), AppStream üstverisini ve simgeleri `/usr/local` dizinine kurar.
+`mrt` ve `mrt-studio` ikili dosyalarını, masaüstü kısayolunu (`mrt-studio.desktop`), dosya türü tanımını (`mrt.xml`), GtkSourceView sözdizimi renklendirmesini (`mrt.lang`), AppStream üstverisini ve simgeleri kurar.
+
+---
+
+## El Kitabı (PDF Handbook)
+
+MRT dilinin tüm ayrıntılarını, sözdizimini, standart kütüphanesini ve MRT Studio kullanım kılavuzunu içeren 15 sayfalık yayın kalitesinde PDF el kitabı hazırlanmıştır:
+* 📄 **[MRT_El_Kitabi.pdf](MRT_El_Kitabi.pdf)** — Tam Kılavuz ve Referans Belgesi
 
 ---
 
