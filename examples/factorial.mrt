@@ -1,10 +1,12 @@
 // factorial.mrt
-fn factorial(n) {
-    if n <= 1 {
-        return 1
+
+task faktoriyel(n) {
+    when n <= 1 {
+        give 1
     }
 
-    return n * factorial(n - 1)
+    give n * faktoriyel(n - 1)
 }
 
-print(factorial(5))
+var sonuc = faktoriyel(5)
+say "Faktöriyel: " + toText(sonuc)

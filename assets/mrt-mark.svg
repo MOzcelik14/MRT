@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="mrtGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00D2FF" />
+      <stop offset="100%" stop-color="#0066FF" />
+    </linearGradient>
+    <linearGradient id="mrtGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7928CA" />
+      <stop offset="100%" stop-color="#FF0080" />
+    </linearGradient>
+    <linearGradient id="mrtGrad3" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00F5D4" />
+      <stop offset="100%" stop-color="#00BBF9" />
+    </linearGradient>
+  </defs>
+  <!-- Background transparent -->
+  <!-- Geometric M Mark: Sharp, modern, minimal, recognizable at small sizes -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Left Pillar -->
+    <path d="M 24 104 L 24 32 L 48 24 L 48 96 Z" fill="url(#mrtGrad1)" />
+    <!-- Center Chevron Left -->
+    <path d="M 48 24 L 64 62 L 64 86 L 48 48 Z" fill="#0052D4" opacity="0.9" />
+    <!-- Center Chevron Right -->
+    <path d="M 64 62 L 80 24 L 80 48 L 64 86 Z" fill="url(#mrtGrad2)" />
+    <!-- Right Pillar -->
+    <path d="M 80 24 L 104 32 L 104 104 L 80 96 Z" fill="url(#mrtGrad2)" />
+    <!-- Central Energy Diamond -->
+    <polygon points="64,30 76,52 64,74 52,52" fill="url(#mrtGrad3)" />
+  </g>
+</svg>

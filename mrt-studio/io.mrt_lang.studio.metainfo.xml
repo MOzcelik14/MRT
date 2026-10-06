@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.mrt_lang.studio</id>
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+  <name>MRT Studio</name>
+  <summary>Native development environment for the MRT programming language</summary>
+  <summary xml:lang="tr">MRT programlama dili için yerel geliştirme ortamı</summary>
+  <description>
+    <p>
+      MRT Studio is a lightweight, modern, native Linux IDE designed specifically for the MRT programming language.
+      Built with GTK4 and GtkSourceView 5, it offers instant startup, multi-tab editing, asynchronous script execution,
+      clickable error diagnostics, and a distraction-free workflow.
+    </p>
+    <p xml:lang="tr">
+      MRT Studio, MRT programlama dili için özel olarak tasarlanmış, hafif, modern ve yerel bir Linux geliştirme ortamıdır.
+      GTK4 ve GtkSourceView 5 ile geliştirilmiş olup anında açılış, sekmeli düzenleme, asenkron kod çalıştırma ve
+      tıklanabilir hata navigasyonu sunar.
+    </p>
+  </description>
+  <launchable type="desktop-id">mrt-studio.desktop</launchable>
+  <url type="homepage">https://github.com/mozcelik/MRT</url>
+  <provides>
+    <binary>mrt-studio</binary>
+    <mediatype>text/x-mrt</mediatype>
+  </provides>
+  <releases>
+    <release version="0.2.0" date="2026-10-06">
+      <description>
+        <p>MRT 0.2 syntax update, Turkish and English localization, Command Palette, Quick Open, Project Search, and Session Recovery.</p>
+      </description>
+    </release>
+    <release version="0.1.0" date="2026-10-06">
+      <description>
+        <p>Initial release of MRT Studio.</p>
+      </description>
+    </release>
+  </releases>
+</component>

@@ -1,0 +1,304 @@
+# English translation for MRT Studio.
+# Copyright (C) 2026 MRT Project
+# This file is distributed under the same license as the MRT Studio package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: mrt-studio 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-06 22:00+0300\n"
+"PO-Revision-Date: 2026-10-06 22:00+0300\n"
+"Last-Translator: MRT Team\n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "File"
+msgstr "File"
+
+msgid "Edit"
+msgstr "Edit"
+
+msgid "View"
+msgstr "View"
+
+msgid "Run"
+msgstr "Run"
+
+msgid "Help"
+msgstr "Help"
+
+msgid "New File"
+msgstr "New File"
+
+msgid "New Project"
+msgstr "New Project"
+
+msgid "Open File"
+msgstr "Open File"
+
+msgid "Open Project"
+msgstr "Open Project"
+
+msgid "Save"
+msgstr "Save"
+
+msgid "Save As"
+msgstr "Save As"
+
+msgid "Save As…"
+msgstr "Save As…"
+
+msgid "Save All"
+msgstr "Save All"
+
+msgid "Close File"
+msgstr "Close File"
+
+msgid "Close Project"
+msgstr "Close Project"
+
+msgid "Restore Previous Session"
+msgstr "Restore Previous Session"
+
+msgid "Settings"
+msgstr "Settings"
+
+msgid "Exit"
+msgstr "Exit"
+
+msgid "Undo"
+msgstr "Undo"
+
+msgid "Redo"
+msgstr "Redo"
+
+msgid "Cut"
+msgstr "Cut"
+
+msgid "Copy"
+msgstr "Copy"
+
+msgid "Paste"
+msgstr "Paste"
+
+msgid "Select All"
+msgstr "Select All"
+
+msgid "Find"
+msgstr "Find"
+
+msgid "Replace"
+msgstr "Replace"
+
+msgid "Go to Line"
+msgstr "Go to Line"
+
+msgid "Go to Line…"
+msgstr "Go to Line…"
+
+msgid "Toggle Sidebar"
+msgstr "Toggle Sidebar"
+
+msgid "Toggle Output"
+msgstr "Toggle Output"
+
+msgid "Command Palette"
+msgstr "Command Palette"
+
+msgid "Command Palette…"
+msgstr "Command Palette…"
+
+msgid "Quick Open"
+msgstr "Quick Open"
+
+msgid "Quick Open…"
+msgstr "Quick Open…"
+
+msgid "Find in Files"
+msgstr "Find in Files"
+
+msgid "Find in Files…"
+msgstr "Find in Files…"
+
+msgid "Run Active File"
+msgstr "Run Active File"
+
+msgid "Run Current File"
+msgstr "Run Current File"
+
+msgid "Stop"
+msgstr "Stop"
+
+msgid "Stop Execution"
+msgstr "Stop Execution"
+
+msgid "Project"
+msgstr "Project"
+
+msgid "Files"
+msgstr "Files"
+
+msgid "Symbols"
+msgstr "Symbols"
+
+msgid "Functions"
+msgstr "Functions"
+
+msgid "Variables"
+msgstr "Variables"
+
+msgid "Output"
+msgstr "Output"
+
+msgid "Problems"
+msgstr "Problems"
+
+msgid "Search"
+msgstr "Search"
+
+msgid "Search Results"
+msgstr "Search Results"
+
+msgid "Clear Output"
+msgstr "Clear Output"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Create"
+msgstr "Create"
+
+msgid "Open"
+msgstr "Open"
+
+msgid "Recover"
+msgstr "Recover"
+
+msgid "Discard"
+msgstr "Discard"
+
+msgid "Previous"
+msgstr "Previous"
+
+msgid "Next"
+msgstr "Next"
+
+msgid "Replace All"
+msgstr "Replace All"
+
+msgid "Search…"
+msgstr "Search…"
+
+msgid "Build with MRT."
+msgstr "Build with MRT."
+
+msgid "Recent Projects"
+msgstr "Recent Projects"
+
+msgid "No recent projects"
+msgstr "No recent projects"
+
+msgid "Spaces: %d"
+msgstr "Spaces: %d"
+
+msgid "Tab: %d"
+msgstr "Tab: %d"
+
+msgid "Ln %d, Col %d"
+msgstr "Ln %d, Col %d"
+
+msgid "About MRT Studio"
+msgstr "About MRT Studio"
+
+msgid "Native development for MRT."
+msgstr "Native development for MRT."
+
+msgid "MRT Studio found unsaved changes from a previous session."
+msgstr "MRT Studio found unsaved changes from a previous session."
+
+msgid "Language changed. Please restart MRT Studio to apply changes completely."
+msgstr "Language changed. Please restart MRT Studio to apply changes completely."
+
+msgid "Unsaved Changes"
+msgstr "Unsaved Changes"
+
+msgid "Save changes to \"%s\" before closing?"
+msgstr "Save changes to \"%s\" before closing?"
+
+msgid "New MRT Project"
+msgstr "New MRT Project"
+
+msgid "Project Name:"
+msgstr "Project Name:"
+
+msgid "Project Location:"
+msgstr "Project Location:"
+
+msgid "Template:"
+msgstr "Template:"
+
+msgid "Empty Project"
+msgstr "Empty Project"
+
+msgid "Console Application"
+msgstr "Console Application"
+
+msgid "Library"
+msgstr "Library"
+
+msgid "Browse…"
+msgstr "Browse…"
+
+msgid "Preferences"
+msgstr "Preferences"
+
+msgid "Interface Language"
+msgstr "Interface Language"
+
+msgid "System Default"
+msgstr "System Default"
+
+msgid "Font Family:"
+msgstr "Font Family:"
+
+msgid "Font Size:"
+msgstr "Font Size:"
+
+msgid "Tab Width:"
+msgstr "Tab Width:"
+
+msgid "Insert spaces instead of tabs"
+msgstr "Insert spaces instead of tabs"
+
+msgid "Show line numbers"
+msgstr "Show line numbers"
+
+msgid "Highlight current line"
+msgstr "Highlight current line"
+
+msgid "Word wrap"
+msgstr "Word wrap"
+
+msgid "Auto indentation"
+msgstr "Auto indentation"
+
+msgid "Highlight matching brackets"
+msgstr "Highlight matching brackets"
+
+msgid "MRT Executable Path:"
+msgstr "MRT Executable Path:"
+
+msgid "Line Number:"
+msgstr "Line Number:"
+
+msgid "Go"
+msgstr "Go"
+
+msgid "File not found"
+msgstr "File not found"
+
+msgid "No matches found"
+msgstr "No matches found"

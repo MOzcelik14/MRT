@@ -1,0 +1,304 @@
+# Turkish translation for MRT Studio.
+# Copyright (C) 2026 MRT Project
+# This file is distributed under the same license as the MRT Studio package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: mrt-studio 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-06 22:00+0300\n"
+"PO-Revision-Date: 2026-10-06 22:00+0300\n"
+"Last-Translator: MRT Team\n"
+"Language-Team: Turkish\n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "File"
+msgstr "Dosya"
+
+msgid "Edit"
+msgstr "Düzen"
+
+msgid "View"
+msgstr "Görünüm"
+
+msgid "Run"
+msgstr "Çalıştır"
+
+msgid "Help"
+msgstr "Yardım"
+
+msgid "New File"
+msgstr "Yeni Dosya"
+
+msgid "New Project"
+msgstr "Yeni Proje"
+
+msgid "Open File"
+msgstr "Dosya Aç"
+
+msgid "Open Project"
+msgstr "Proje Aç"
+
+msgid "Save"
+msgstr "Kaydet"
+
+msgid "Save As"
+msgstr "Farklı Kaydet"
+
+msgid "Save As…"
+msgstr "Farklı Kaydet…"
+
+msgid "Save All"
+msgstr "Tümünü Kaydet"
+
+msgid "Close File"
+msgstr "Dosyayı Kapat"
+
+msgid "Close Project"
+msgstr "Projeyi Kapat"
+
+msgid "Restore Previous Session"
+msgstr "Önceki Oturumu Geri Yükle"
+
+msgid "Settings"
+msgstr "Ayarlar"
+
+msgid "Exit"
+msgstr "Çıkış"
+
+msgid "Undo"
+msgstr "Geri Al"
+
+msgid "Redo"
+msgstr "Yinele"
+
+msgid "Cut"
+msgstr "Kes"
+
+msgid "Copy"
+msgstr "Kopyala"
+
+msgid "Paste"
+msgstr "Yapıştır"
+
+msgid "Select All"
+msgstr "Tümünü Seç"
+
+msgid "Find"
+msgstr "Bul"
+
+msgid "Replace"
+msgstr "Değiştir"
+
+msgid "Go to Line"
+msgstr "Satıra Git"
+
+msgid "Go to Line…"
+msgstr "Satıra Git…"
+
+msgid "Toggle Sidebar"
+msgstr "Kenar Çubuğunu Göster/Gizle"
+
+msgid "Toggle Output"
+msgstr "Çıktıyı Göster/Gizle"
+
+msgid "Command Palette"
+msgstr "Komut Paleti"
+
+msgid "Command Palette…"
+msgstr "Komut Paleti…"
+
+msgid "Quick Open"
+msgstr "Hızlı Dosya Aç"
+
+msgid "Quick Open…"
+msgstr "Hızlı Dosya Aç…"
+
+msgid "Find in Files"
+msgstr "Dosyalarda Bul"
+
+msgid "Find in Files…"
+msgstr "Dosyalarda Bul…"
+
+msgid "Run Active File"
+msgstr "Geçerli Dosyayı Çalıştır"
+
+msgid "Run Current File"
+msgstr "Geçerli Dosyayı Çalıştır"
+
+msgid "Stop"
+msgstr "Durdur"
+
+msgid "Stop Execution"
+msgstr "Çalışmayı Durdur"
+
+msgid "Project"
+msgstr "Proje"
+
+msgid "Files"
+msgstr "Dosyalar"
+
+msgid "Symbols"
+msgstr "Semboller"
+
+msgid "Functions"
+msgstr "Fonksiyonlar"
+
+msgid "Variables"
+msgstr "Değişkenler"
+
+msgid "Output"
+msgstr "Çıktı"
+
+msgid "Problems"
+msgstr "Sorunlar"
+
+msgid "Search"
+msgstr "Arama"
+
+msgid "Search Results"
+msgstr "Arama Sonuçları"
+
+msgid "Clear Output"
+msgstr "Çıktıyı Temizle"
+
+msgid "Cancel"
+msgstr "İptal"
+
+msgid "Create"
+msgstr "Oluştur"
+
+msgid "Open"
+msgstr "Aç"
+
+msgid "Recover"
+msgstr "Kurtar"
+
+msgid "Discard"
+msgstr "Sil"
+
+msgid "Previous"
+msgstr "Önceki"
+
+msgid "Next"
+msgstr "Sonraki"
+
+msgid "Replace All"
+msgstr "Tümünü Değiştir"
+
+msgid "Search…"
+msgstr "Ara…"
+
+msgid "Build with MRT."
+msgstr "MRT ile geliştir."
+
+msgid "Recent Projects"
+msgstr "Son Projeler"
+
+msgid "No recent projects"
+msgstr "Henüz son proje yok"
+
+msgid "Spaces: %d"
+msgstr "Boşluk: %d"
+
+msgid "Tab: %d"
+msgstr "Sekme: %d"
+
+msgid "Ln %d, Col %d"
+msgstr "Sat %d, Süt %d"
+
+msgid "About MRT Studio"
+msgstr "MRT Studio Hakkında"
+
+msgid "Native development for MRT."
+msgstr "MRT için yerel geliştirme ortamı."
+
+msgid "MRT Studio found unsaved changes from a previous session."
+msgstr "MRT Studio önceki oturumdan kaydedilmemiş değişiklikler buldu."
+
+msgid "Language changed. Please restart MRT Studio to apply changes completely."
+msgstr "Arayüz dili değiştirildi. Değişikliklerin tam olarak uygulanması için lütfen MRT Studio'yu yeniden başlatın."
+
+msgid "Unsaved Changes"
+msgstr "Kaydedilmemiş Değişiklikler"
+
+msgid "Save changes to \"%s\" before closing?"
+msgstr "\"%s\" dosyasındaki değişiklikler kapatılmadan önce kaydedilsin mi?"
+
+msgid "New MRT Project"
+msgstr "Yeni MRT Projesi"
+
+msgid "Project Name:"
+msgstr "Proje Adı:"
+
+msgid "Project Location:"
+msgstr "Proje Konumu:"
+
+msgid "Template:"
+msgstr "Şablon:"
+
+msgid "Empty Project"
+msgstr "Boş Proje"
+
+msgid "Console Application"
+msgstr "Konsol Uygulaması"
+
+msgid "Library"
+msgstr "Kütüphane"
+
+msgid "Browse…"
+msgstr "Gözat…"
+
+msgid "Preferences"
+msgstr "Tercihler"
+
+msgid "Interface Language"
+msgstr "Arayüz Dili"
+
+msgid "System Default"
+msgstr "Sistem Varsayılanı"
+
+msgid "Font Family:"
+msgstr "Yazı Tipi:"
+
+msgid "Font Size:"
+msgstr "Yazı Boyutu:"
+
+msgid "Tab Width:"
+msgstr "Sekme Genişliği:"
+
+msgid "Insert spaces instead of tabs"
+msgstr "Sekmeler yerine boşluk ekle"
+
+msgid "Show line numbers"
+msgstr "Satır numaralarını göster"
+
+msgid "Highlight current line"
+msgstr "Geçerli satırı vurgula"
+
+msgid "Word wrap"
+msgstr "Sözcük kaydır"
+
+msgid "Auto indentation"
+msgstr "Otomatik girintileme"
+
+msgid "Highlight matching brackets"
+msgstr "Eşleşen parantezleri vurgula"
+
+msgid "MRT Executable Path:"
+msgstr "MRT Çalıştırılabilir Yolu:"
+
+msgid "Line Number:"
+msgstr "Satır Numarası:"
+
+msgid "Go"
+msgstr "Git"
+
+msgid "File not found"
+msgstr "Dosya bulunamadı"
+
+msgid "No matches found"
+msgstr "Eşleşme bulunamadı"

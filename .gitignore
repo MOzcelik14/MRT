@@ -4,6 +4,8 @@ bin/
 obj/
 *.o
 *.dSYM/
+mrt-studio/mrt-studio
+mrt-studio/obj/
 
 # Temporary files
 *.tmp

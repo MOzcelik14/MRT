@@ -8,7 +8,7 @@ struct Environment;
 struct Interpreter;
 
 typedef enum {
-    VAL_NULL,
+    VAL_NONE,
     VAL_INT,
     VAL_FLOAT,
     VAL_BOOL,
@@ -16,6 +16,8 @@ typedef enum {
     VAL_FUNCTION,
     VAL_NATIVE_FN
 } ValueType;
+
+#define VAL_NULL VAL_NONE
 
 typedef struct Value Value;
 
@@ -49,6 +51,7 @@ struct Value {
 };
 
 /* Value Constructors */
+Value value_none(void);
 Value value_null(void);
 Value value_int(int64_t val);
 Value value_float(double val);

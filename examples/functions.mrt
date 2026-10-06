@@ -1,17 +1,17 @@
 // functions.mrt
-fn topla(a, b) {
-    return a + b
+task topla(a, b) {
+    give a + b
 }
 
-let sonuc = topla(10, 20)
-print("10 + 20 =", sonuc)
+var sonuc = topla(10, 20)
+say "10 + 20 = " + toText(sonuc)
 
 // Lexical scope test
-let x = 10
-fn test() {
-    let x = 20
-    print("test içi x:", x)
+var x = 10
+task test() {
+    var x = 20
+    say "test içi x: " + toText(x)
 }
 
 test()
-print("test dışı x:", x)
+say "test dışı x: " + toText(x)

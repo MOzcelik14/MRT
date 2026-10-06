@@ -54,6 +54,24 @@ static void skip_whitespace_and_comments(Lexer *lexer) {
                     while (peek(lexer) != '\n' && !is_at_end(lexer)) {
                         advance(lexer);
                     }
+                } else if (peek_next(lexer) == '*') {
+                    // Block comment: /* ... */
+                    advance(lexer); // consume '/'
+                    advance(lexer); // consume '*'
+                    while (!is_at_end(lexer)) {
+                        if (peek(lexer) == '*' && peek_next(lexer) == '/') {
+                            advance(lexer); // consume '*'
+                            advance(lexer); // consume '/'
+                            break;
+                        }
+                        if (peek(lexer) == '\n') {
+                            lexer->line++;
+                            lexer->column = 0;
+                            advance(lexer);
+                        } else {
+                            advance(lexer);
+                        }
+                    }
                 } else {
                     return;
                 }
@@ -93,26 +111,39 @@ static Token error_token(Lexer *lexer, const char *message) {
 static TokenType check_keyword(const char *text, size_t length) {
     switch (length) {
         case 2:
-            if (text[0] == 'f' && text[1] == 'n') return TOKEN_FN;
-            if (text[0] == 'i' && text[1] == 'f') return TOKEN_IF;
+            if (text[0] == 'a' && text[1] == 's') return TOKEN_AS;
+            if (text[0] == 'i' && text[1] == 'n') return TOKEN_IN;
+            if (text[0] == 'n' && text[1] == 'o') return TOKEN_NO;
             if (text[0] == 'o' && text[1] == 'r') return TOKEN_OR;
             break;
         case 3:
-            if (memcmp(text, "let", 3) == 0) return TOKEN_LET;
+            if (memcmp(text, "var", 3) == 0) return TOKEN_VAR;
+            if (memcmp(text, "say", 3) == 0) return TOKEN_SAY;
+            if (memcmp(text, "yes", 3) == 0) return TOKEN_YES;
             if (memcmp(text, "and", 3) == 0) return TOKEN_AND;
             if (memcmp(text, "not", 3) == 0) return TOKEN_NOT;
+            if (memcmp(text, "use", 3) == 0) return TOKEN_USE;
             break;
         case 4:
-            if (memcmp(text, "else", 4) == 0) return TOKEN_ELSE;
-            if (memcmp(text, "true", 4) == 0) return TOKEN_TRUE;
-            if (memcmp(text, "null", 4) == 0) return TOKEN_NULL;
+            if (memcmp(text, "task", 4) == 0) return TOKEN_TASK;
+            if (memcmp(text, "give", 4) == 0) return TOKEN_GIVE;
+            if (memcmp(text, "when", 4) == 0) return TOKEN_WHEN;
+            if (memcmp(text, "none", 4) == 0) return TOKEN_NONE;
+            if (memcmp(text, "from", 4) == 0) return TOKEN_FROM;
+            if (memcmp(text, "each", 4) == 0) return TOKEN_EACH;
+            if (memcmp(text, "type", 4) == 0) return TOKEN_TYPE;
             break;
         case 5:
-            if (memcmp(text, "while", 5) == 0) return TOKEN_WHILE;
-            if (memcmp(text, "false", 5) == 0) return TOKEN_FALSE;
+            if (memcmp(text, "break", 5) == 0) return TOKEN_BREAK;
             break;
         case 6:
-            if (memcmp(text, "return", 6) == 0) return TOKEN_RETURN;
+            if (memcmp(text, "repeat", 6) == 0) return TOKEN_REPEAT;
+            break;
+        case 8:
+            if (memcmp(text, "continue", 8) == 0) return TOKEN_CONTINUE;
+            break;
+        case 9:
+            if (memcmp(text, "otherwise", 9) == 0) return TOKEN_OTHERWISE;
             break;
     }
     return TOKEN_IDENTIFIER;

@@ -18,6 +18,9 @@ typedef enum {
     AST_IF,
     AST_WHILE,
     AST_RETURN,
+    AST_SAY,
+    AST_BREAK,
+    AST_CONTINUE,
     AST_EXPR_STMT
 } ASTNodeType;
 
@@ -26,7 +29,8 @@ typedef enum {
     LITERAL_FLOAT,
     LITERAL_STRING,
     LITERAL_BOOL,
-    LITERAL_NULL
+    LITERAL_NONE,
+    LITERAL_NULL = LITERAL_NONE
 } LiteralType;
 
 typedef struct ASTNode ASTNode;
@@ -118,6 +122,11 @@ struct ASTNode {
             ASTNode *value; /* can be NULL */
         } return_stmt;
 
+        /* AST_SAY */
+        struct {
+            ASTNode *value;
+        } say_stmt;
+
         /* AST_EXPR_STMT */
         struct {
             ASTNode *expression;
@@ -139,6 +148,7 @@ ASTNode *ast_new_literal_int(int64_t val, int line, int col);
 ASTNode *ast_new_literal_float(double val, int line, int col);
 ASTNode *ast_new_literal_string(char *val, int line, int col);
 ASTNode *ast_new_literal_bool(bool val, int line, int col);
+ASTNode *ast_new_literal_none(int line, int col);
 ASTNode *ast_new_literal_null(int line, int col);
 
 ASTNode *ast_new_identifier(char *name, int line, int col);
@@ -151,6 +161,9 @@ ASTNode *ast_new_func_call(ASTNode *callee, ASTNode **args, size_t arg_count, in
 ASTNode *ast_new_if(ASTNode *condition, ASTNode *then_branch, ASTNode *else_branch, int line, int col);
 ASTNode *ast_new_while(ASTNode *condition, ASTNode *body, int line, int col);
 ASTNode *ast_new_return(ASTNode *value, int line, int col);
+ASTNode *ast_new_say(ASTNode *value, int line, int col);
+ASTNode *ast_new_break(int line, int col);
+ASTNode *ast_new_continue(int line, int col);
 ASTNode *ast_new_expr_stmt(ASTNode *expr, int line, int col);
 
 /* AST Destructor */

@@ -1,4 +1,5 @@
 #include "application.h"
+#include "i18n.h"
 
 struct _MrtApplication {
     GtkApplication parent_instance;
@@ -20,6 +21,7 @@ static const GActionEntry app_entries[] = {
 
 static void mrt_application_init(MrtApplication *app) {
     app->settings = mrt_settings_load();
+    mrt_i18n_init(app->settings->interface_language);
 }
 
 static void mrt_application_dispose(GObject *object) {
@@ -28,6 +30,7 @@ static void mrt_application_dispose(GObject *object) {
         mrt_settings_free(app->settings);
         app->settings = NULL;
     }
+    mrt_i18n_cleanup();
     G_OBJECT_CLASS(mrt_application_parent_class)->dispose(object);
 }
 
@@ -51,17 +54,38 @@ static void mrt_application_startup(GApplication *gapp) {
     const char * const accels_save_as[] = { "<Ctrl><Shift>s", NULL };
     gtk_application_set_accels_for_action(app, "win.save_as_file", accels_save_as);
 
+    const char * const accels_save_all[] = { "<Ctrl><Alt>s", NULL };
+    gtk_application_set_accels_for_action(app, "win.save_all", accels_save_all);
+
     const char * const accels_find[] = { "<Ctrl>f", NULL };
     gtk_application_set_accels_for_action(app, "win.find", accels_find);
 
     const char * const accels_replace[] = { "<Ctrl>h", NULL };
     gtk_application_set_accels_for_action(app, "win.replace", accels_replace);
 
+    const char * const accels_find_in_files[] = { "<Ctrl><Shift>f", NULL };
+    gtk_application_set_accels_for_action(app, "win.find_in_files", accels_find_in_files);
+
+    const char * const accels_goto[] = { "<Ctrl>g", NULL };
+    gtk_application_set_accels_for_action(app, "win.goto_line", accels_goto);
+
+    const char * const accels_palette[] = { "<Ctrl><Shift>p", NULL };
+    gtk_application_set_accels_for_action(app, "win.command_palette", accels_palette);
+
+    const char * const accels_quick_open[] = { "<Ctrl>p", NULL };
+    gtk_application_set_accels_for_action(app, "win.quick_open", accels_quick_open);
+
     const char * const accels_undo[] = { "<Ctrl>z", NULL };
     gtk_application_set_accels_for_action(app, "win.undo", accels_undo);
 
     const char * const accels_redo[] = { "<Ctrl><Shift>z", "<Ctrl>y", NULL };
     gtk_application_set_accels_for_action(app, "win.redo", accels_redo);
+
+    const char * const accels_sidebar[] = { "<Ctrl>b", NULL };
+    gtk_application_set_accels_for_action(app, "win.toggle_sidebar", accels_sidebar);
+
+    const char * const accels_output[] = { "<Ctrl>j", NULL };
+    gtk_application_set_accels_for_action(app, "win.toggle_output", accels_output);
 
     const char * const accels_run[] = { "F5", NULL };
     gtk_application_set_accels_for_action(app, "win.run", accels_run);

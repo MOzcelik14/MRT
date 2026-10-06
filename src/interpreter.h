@@ -10,6 +10,8 @@
 typedef enum {
     INTERP_OK,
     INTERP_RETURN,
+    INTERP_BREAK,
+    INTERP_CONTINUE,
     INTERP_ERROR
 } InterpStatus;
 

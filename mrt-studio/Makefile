@@ -1,12 +1,21 @@
 CC ?= gcc
 CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations -O2
 DEBUG_CFLAGS = -std=c11 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations -O0 -g
+PREFIX ?= /usr/local
 
 TARGET = mrt-studio
 SRC_DIR = src
 OBJ_DIR = obj
 
-SRCS = $(SRC_DIR)/settings.c \
+SRCS = $(SRC_DIR)/i18n.c \
+       $(SRC_DIR)/session.c \
+       $(SRC_DIR)/statusbar.c \
+       $(SRC_DIR)/outline.c \
+       $(SRC_DIR)/welcome.c \
+       $(SRC_DIR)/palette.c \
+       $(SRC_DIR)/quickopen.c \
+       $(SRC_DIR)/search.c \
+       $(SRC_DIR)/settings.c \
        $(SRC_DIR)/output.c \
        $(SRC_DIR)/editor.c \
        $(SRC_DIR)/project.c \
@@ -43,9 +52,16 @@ endif
 ALL_CFLAGS = $(CFLAGS) $(GTK_CFLAGS)
 ALL_LIBS = $(GTK_LIBS) -lm
 
-.PHONY: all clean run debug
+.PHONY: all clean run debug locales install uninstall
 
-all: $(TARGET)
+all: locales $(TARGET)
+
+locales:
+	@mkdir -p locale/tr/LC_MESSAGES locale/en/LC_MESSAGES
+	@if command -v msgfmt >/dev/null 2>&1; then \
+		msgfmt -o locale/tr/LC_MESSAGES/mrt-studio.mo po/tr.po 2>/dev/null || true; \
+		msgfmt -o locale/en/LC_MESSAGES/mrt-studio.mo po/en.po 2>/dev/null || true; \
+	fi
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(ALL_LIBS)
@@ -59,6 +75,37 @@ debug: clean $(TARGET)
 
 run: $(TARGET)
 	./$(TARGET)
+
+install: $(TARGET)
+	install -d $(DESTDIR)$(PREFIX)/bin
+	install -m 755 $(TARGET) $(DESTDIR)$(PREFIX)/bin/
+	install -d $(DESTDIR)$(PREFIX)/share/applications
+	install -m 644 mrt-studio.desktop $(DESTDIR)$(PREFIX)/share/applications/
+	install -d $(DESTDIR)$(PREFIX)/share/icons/hicolor/scalable/apps
+	install -m 644 resources/icons/mrt-studio-icon.svg $(DESTDIR)$(PREFIX)/share/icons/hicolor/scalable/apps/mrt-studio.svg
+	install -d $(DESTDIR)$(PREFIX)/share/mime/packages
+	install -m 644 mrt.xml $(DESTDIR)$(PREFIX)/share/mime/packages/
+	install -d $(DESTDIR)$(PREFIX)/share/metainfo
+	install -m 644 io.mrt_lang.studio.metainfo.xml $(DESTDIR)$(PREFIX)/share/metainfo/
+	install -d $(DESTDIR)$(PREFIX)/share/locale/tr/LC_MESSAGES
+	install -d $(DESTDIR)$(PREFIX)/share/locale/en/LC_MESSAGES
+	if [ -f locale/tr/LC_MESSAGES/mrt-studio.mo ]; then \
+		install -m 644 locale/tr/LC_MESSAGES/mrt-studio.mo $(DESTDIR)$(PREFIX)/share/locale/tr/LC_MESSAGES/; \
+	fi
+	if [ -f locale/en/LC_MESSAGES/mrt-studio.mo ]; then \
+		install -m 644 locale/en/LC_MESSAGES/mrt-studio.mo $(DESTDIR)$(PREFIX)/share/locale/en/LC_MESSAGES/; \
+	fi
+	@which update-desktop-database >/dev/null 2>&1 && update-desktop-database || true
+	@which update-mime-database >/dev/null 2>&1 && update-mime-database $(DESTDIR)$(PREFIX)/share/mime || true
+
+uninstall:
+	rm -f $(DESTDIR)$(PREFIX)/bin/$(TARGET)
+	rm -f $(DESTDIR)$(PREFIX)/share/applications/mrt-studio.desktop
+	rm -f $(DESTDIR)$(PREFIX)/share/icons/hicolor/scalable/apps/mrt-studio.svg
+	rm -f $(DESTDIR)$(PREFIX)/share/mime/packages/mrt.xml
+	rm -f $(DESTDIR)$(PREFIX)/share/metainfo/io.mrt_lang.studio.metainfo.xml
+	rm -f $(DESTDIR)$(PREFIX)/share/locale/tr/LC_MESSAGES/mrt-studio.mo
+	rm -f $(DESTDIR)$(PREFIX)/share/locale/en/LC_MESSAGES/mrt-studio.mo
 
 clean:
 	rm -rf $(OBJ_DIR) $(TARGET)

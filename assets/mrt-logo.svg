@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 128" width="420" height="128">
+  <defs>
+    <linearGradient id="logoGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00D2FF" />
+      <stop offset="100%" stop-color="#0066FF" />
+    </linearGradient>
+    <linearGradient id="logoGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7928CA" />
+      <stop offset="100%" stop-color="#FF0080" />
+    </linearGradient>
+    <linearGradient id="logoGrad3" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00F5D4" />
+      <stop offset="100%" stop-color="#00BBF9" />
+    </linearGradient>
+  </defs>
+  <!-- Mark Symbol -->
+  <g transform="translate(10, 0)">
+    <path d="M 24 104 L 24 32 L 48 24 L 48 96 Z" fill="url(#logoGrad1)" />
+    <path d="M 48 24 L 64 62 L 64 86 L 48 48 Z" fill="#0052D4" opacity="0.9" />
+    <path d="M 64 62 L 80 24 L 80 48 L 64 86 Z" fill="url(#logoGrad2)" />
+    <path d="M 80 24 L 104 32 L 104 104 L 80 96 Z" fill="url(#logoGrad2)" />
+    <polygon points="64,30 76,52 64,74 52,52" fill="url(#logoGrad3)" />
+  </g>
+  <!-- Wordmark -->
+  <text x="146" y="80" font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', 'Ubuntu', sans-serif" font-size="58" font-weight="900" letter-spacing="4" fill="#E2E8F0">MRT</text>
+  <!-- Subtitle -->
+  <text x="148" y="104" font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', 'Ubuntu', sans-serif" font-size="14" font-weight="500" letter-spacing="1.5" fill="#94A3B8">PROGRAMMING LANGUAGE</text>
+</svg>

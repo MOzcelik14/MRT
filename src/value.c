@@ -1,11 +1,15 @@
 #include "value.h"
 #include "environment.h"
 
-Value value_null(void) {
+Value value_none(void) {
     Value val;
-    val.type = VAL_NULL;
+    val.type = VAL_NONE;
     val.as.int_val = 0;
     return val;
+}
+
+Value value_null(void) {
+    return value_none();
 }
 
 Value value_int(int64_t val) {
@@ -180,7 +184,7 @@ bool value_equal(Value a, Value b) {
 
 const char *value_type_name(Value val) {
     switch (val.type) {
-        case VAL_NULL:      return "null";
+        case VAL_NONE:      return "none";
         case VAL_INT:       return "integer";
         case VAL_FLOAT:     return "float";
         case VAL_BOOL:      return "boolean";
@@ -194,8 +198,8 @@ const char *value_type_name(Value val) {
 char *value_to_string(Value val) {
     char buf[128];
     switch (val.type) {
-        case VAL_NULL:
-            return mrt_strdup("null");
+        case VAL_NONE:
+            return mrt_strdup("none");
         case VAL_INT:
             snprintf(buf, sizeof(buf), "%ld", (long)val.as.int_val);
             return mrt_strdup(buf);
@@ -203,14 +207,14 @@ char *value_to_string(Value val) {
             snprintf(buf, sizeof(buf), "%g", val.as.float_val);
             return mrt_strdup(buf);
         case VAL_BOOL:
-            return mrt_strdup(val.as.bool_val ? "true" : "false");
+            return mrt_strdup(val.as.bool_val ? "yes" : "no");
         case VAL_STRING:
             return mrt_strdup(val.as.string_val->chars);
         case VAL_FUNCTION:
-            snprintf(buf, sizeof(buf), "<function %s>", val.as.func_val->name);
+            snprintf(buf, sizeof(buf), "<task %s>", val.as.func_val->name);
             return mrt_strdup(buf);
         case VAL_NATIVE_FN:
-            return mrt_strdup("<native function>");
+            return mrt_strdup("<native task>");
         default:
             return mrt_strdup("<unknown>");
     }
@@ -218,8 +222,8 @@ char *value_to_string(Value val) {
 
 void value_print(Value val) {
     switch (val.type) {
-        case VAL_NULL:
-            printf("null");
+        case VAL_NONE:
+            printf("none");
             break;
         case VAL_INT:
             printf("%ld", (long)val.as.int_val);
@@ -228,16 +232,16 @@ void value_print(Value val) {
             printf("%g", val.as.float_val);
             break;
         case VAL_BOOL:
-            printf("%s", val.as.bool_val ? "true" : "false");
+            printf("%s", val.as.bool_val ? "yes" : "no");
             break;
         case VAL_STRING:
             printf("%s", val.as.string_val->chars);
             break;
         case VAL_FUNCTION:
-            printf("<function %s>", val.as.func_val->name);
+            printf("<task %s>", val.as.func_val->name);
             break;
         case VAL_NATIVE_FN:
-            printf("<native function>");
+            printf("<native task>");
             break;
     }
 }

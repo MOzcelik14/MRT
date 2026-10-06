@@ -15,6 +15,7 @@ typedef struct {
     gboolean auto_indent;
     gboolean highlight_brackets;
     char *mrt_path;
+    char *interface_language; /* "system", "tr", "en" */
 } MrtSettings;
 
 typedef void (*MrtSettingsChangedCallback)(MrtSettings *settings, gpointer user_data);

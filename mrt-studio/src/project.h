@@ -15,6 +15,7 @@ void mrt_project_free(MrtProject *proj);
 void mrt_project_open_folder(MrtProject *proj, GFile *folder);
 void mrt_project_refresh(MrtProject *proj);
 GFile *mrt_project_get_root(MrtProject *proj);
+GList *mrt_project_get_all_files(MrtProject *proj);
 
 void mrt_project_new_dialog(MrtProject *proj, GtkWindow *parent, MrtProjectCreatedCallback on_created, gpointer user_data);
 

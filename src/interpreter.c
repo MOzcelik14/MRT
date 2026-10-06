@@ -58,10 +58,24 @@ static EvalResult make_return(Value val) {
     return res;
 }
 
+static EvalResult make_break(void) {
+    EvalResult res;
+    res.status = INTERP_BREAK;
+    res.value = value_none();
+    return res;
+}
+
+static EvalResult make_continue(void) {
+    EvalResult res;
+    res.status = INTERP_CONTINUE;
+    res.value = value_none();
+    return res;
+}
+
 static EvalResult make_error(void) {
     EvalResult res;
     res.status = INTERP_ERROR;
-    res.value = value_null();
+    res.value = value_none();
     return res;
 }
 
@@ -515,16 +529,24 @@ EvalResult interpreter_eval_node(Interpreter *interp, ASTNode *node) {
                 if (!truthy) break;
 
                 EvalResult body_res = interpreter_eval_node(interp, node->as.while_stmt.body);
+                if (body_res.status == INTERP_BREAK) {
+                    value_release(body_res.value);
+                    break;
+                }
+                if (body_res.status == INTERP_CONTINUE) {
+                    value_release(body_res.value);
+                    continue;
+                }
                 if (body_res.status != INTERP_OK) {
                     return body_res;
                 }
                 value_release(body_res.value);
             }
-            return make_ok(value_null());
+            return make_ok(value_none());
         }
 
         case AST_RETURN: {
-            Value ret_val = value_null();
+            Value ret_val = value_none();
             if (node->as.return_stmt.value) {
                 EvalResult res = interpreter_eval_node(interp, node->as.return_stmt.value);
                 if (res.status != INTERP_OK) return res;
@@ -533,12 +555,28 @@ EvalResult interpreter_eval_node(Interpreter *interp, ASTNode *node) {
             return make_return(ret_val);
         }
 
+        case AST_SAY: {
+            EvalResult res = interpreter_eval_node(interp, node->as.say_stmt.value);
+            if (res.status != INTERP_OK) return res;
+            value_print(res.value);
+            printf("\n");
+            fflush(stdout);
+            value_release(res.value);
+            return make_ok(value_none());
+        }
+
+        case AST_BREAK:
+            return make_break();
+
+        case AST_CONTINUE:
+            return make_continue();
+
         case AST_EXPR_STMT: {
             return interpreter_eval_node(interp, node->as.expr_stmt.expression);
         }
     }
 
-    return make_ok(value_null());
+    return make_ok(value_none());
 }
 
 EvalResult interpreter_interpret(Interpreter *interp, ASTNode *program) {

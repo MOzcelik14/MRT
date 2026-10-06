@@ -82,10 +82,14 @@ ASTNode *ast_new_literal_bool(bool val, int line, int col) {
     return node;
 }
 
-ASTNode *ast_new_literal_null(int line, int col) {
+ASTNode *ast_new_literal_none(int line, int col) {
     ASTNode *node = ast_alloc_node(AST_LITERAL, line, col);
-    node->as.literal.lit_type = LITERAL_NULL;
+    node->as.literal.lit_type = LITERAL_NONE;
     return node;
+}
+
+ASTNode *ast_new_literal_null(int line, int col) {
+    return ast_new_literal_none(line, col);
 }
 
 ASTNode *ast_new_identifier(char *name, int line, int col) {
@@ -145,6 +149,20 @@ ASTNode *ast_new_return(ASTNode *value, int line, int col) {
     ASTNode *node = ast_alloc_node(AST_RETURN, line, col);
     node->as.return_stmt.value = value;
     return node;
+}
+
+ASTNode *ast_new_say(ASTNode *value, int line, int col) {
+    ASTNode *node = ast_alloc_node(AST_SAY, line, col);
+    node->as.say_stmt.value = value;
+    return node;
+}
+
+ASTNode *ast_new_break(int line, int col) {
+    return ast_alloc_node(AST_BREAK, line, col);
+}
+
+ASTNode *ast_new_continue(int line, int col) {
+    return ast_alloc_node(AST_CONTINUE, line, col);
 }
 
 ASTNode *ast_new_expr_stmt(ASTNode *expr, int line, int col) {
@@ -224,6 +242,14 @@ void ast_free(ASTNode *node) {
 
         case AST_RETURN:
             ast_free(node->as.return_stmt.value);
+            break;
+
+        case AST_SAY:
+            ast_free(node->as.say_stmt.value);
+            break;
+
+        case AST_BREAK:
+        case AST_CONTINUE:
             break;
 
         case AST_EXPR_STMT:
@@ -308,10 +334,10 @@ static void print_node_recursive(const ASTNode *node, const char *prefix, bool i
                     printf("String(\"%s\")\n", node->as.literal.as.string_val);
                     break;
                 case LITERAL_BOOL:
-                    printf("Boolean(%s)\n", node->as.literal.as.bool_val ? "true" : "false");
+                    printf("Boolean(%s)\n", node->as.literal.as.bool_val ? "yes" : "no");
                     break;
-                case LITERAL_NULL:
-                    printf("Null\n");
+                case LITERAL_NONE:
+                    printf("None\n");
                     break;
             }
             break;
@@ -333,7 +359,7 @@ static void print_node_recursive(const ASTNode *node, const char *prefix, bool i
             break;
 
         case AST_FUNCTION_DECL: {
-            printf("FunctionDecl(%s", node->as.func_decl.name);
+            printf("TaskDecl(%s", node->as.func_decl.name);
             if (node->as.func_decl.param_count > 0) {
                 printf("(");
                 for (size_t i = 0; i < node->as.func_decl.param_count; i++) {
@@ -363,7 +389,7 @@ static void print_node_recursive(const ASTNode *node, const char *prefix, bool i
         }
 
         case AST_IF: {
-            printf("IfStmt\n");
+            printf("WhenStmt\n");
             if (node->as.if_stmt.else_branch) {
                 ASTNode *children[3] = {
                     node->as.if_stmt.condition,
@@ -382,7 +408,7 @@ static void print_node_recursive(const ASTNode *node, const char *prefix, bool i
         }
 
         case AST_WHILE: {
-            printf("WhileStmt\n");
+            printf("RepeatStmt\n");
             ASTNode *children[2] = {
                 node->as.while_stmt.condition,
                 node->as.while_stmt.body
@@ -392,10 +418,25 @@ static void print_node_recursive(const ASTNode *node, const char *prefix, bool i
         }
 
         case AST_RETURN:
-            printf("ReturnStmt\n");
+            printf("GiveStmt\n");
             if (node->as.return_stmt.value) {
                 print_node_recursive(node->as.return_stmt.value, child_prefix, true);
             }
+            break;
+
+        case AST_SAY:
+            printf("SayStmt\n");
+            if (node->as.say_stmt.value) {
+                print_node_recursive(node->as.say_stmt.value, child_prefix, true);
+            }
+            break;
+
+        case AST_BREAK:
+            printf("BreakStmt\n");
+            break;
+
+        case AST_CONTINUE:
+            printf("ContinueStmt\n");
             break;
 
         case AST_EXPR_STMT:

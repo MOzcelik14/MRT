@@ -74,11 +74,15 @@ static void synchronize(Parser *parser) {
         }
 
         switch (peek(parser).type) {
-            case TOKEN_FN:
-            case TOKEN_LET:
-            case TOKEN_IF:
-            case TOKEN_WHILE:
-            case TOKEN_RETURN:
+            case TOKEN_TASK:
+            case TOKEN_VAR:
+            case TOKEN_WHEN:
+            case TOKEN_OTHERWISE:
+            case TOKEN_REPEAT:
+            case TOKEN_GIVE:
+            case TOKEN_SAY:
+            case TOKEN_BREAK:
+            case TOKEN_CONTINUE:
             case TOKEN_RBRACE:
                 return;
             default:
@@ -282,19 +286,19 @@ static ASTNode *parse_primary(Parser *parser) {
         return ast_new_literal_string(str, tok.line, tok.column);
     }
 
-    if (match(parser, TOKEN_TRUE)) {
+    if (match(parser, TOKEN_YES)) {
         Token tok = previous(parser);
         return ast_new_literal_bool(true, tok.line, tok.column);
     }
 
-    if (match(parser, TOKEN_FALSE)) {
+    if (match(parser, TOKEN_NO)) {
         Token tok = previous(parser);
         return ast_new_literal_bool(false, tok.line, tok.column);
     }
 
-    if (match(parser, TOKEN_NULL)) {
+    if (match(parser, TOKEN_NONE)) {
         Token tok = previous(parser);
-        return ast_new_literal_null(tok.line, tok.column);
+        return ast_new_literal_none(tok.line, tok.column);
     }
 
     if (match(parser, TOKEN_IDENTIFIER)) {
@@ -330,8 +334,8 @@ static void consume_statement_separator(Parser *parser) {
 }
 
 static ASTNode *parse_var_decl(Parser *parser) {
-    Token let_tok = previous(parser);
-    Token name_tok = consume(parser, TOKEN_IDENTIFIER, "expected variable name after 'let'");
+    Token var_tok = previous(parser);
+    Token name_tok = consume(parser, TOKEN_IDENTIFIER, "expected variable name after 'var'");
     if (parser->panic_mode) return NULL;
 
     char *name = mrt_strdup(name_tok.lexeme);
@@ -341,7 +345,7 @@ static ASTNode *parse_var_decl(Parser *parser) {
         skip_newlines(parser);
         init = parse_expression(parser);
     } else {
-        init = ast_new_literal_null(let_tok.line, let_tok.column);
+        init = ast_new_literal_none(var_tok.line, var_tok.column);
     }
 
     consume_statement_separator(parser);
@@ -350,7 +354,7 @@ static ASTNode *parse_var_decl(Parser *parser) {
         ast_free(init);
         return NULL;
     }
-    return ast_new_var_decl(name, init, let_tok.line, let_tok.column);
+    return ast_new_var_decl(name, init, var_tok.line, var_tok.column);
 }
 
 static ASTNode *parse_block_body(Parser *parser, int line, int col) {
@@ -375,8 +379,8 @@ static ASTNode *parse_block(Parser *parser) {
 }
 
 static ASTNode *parse_func_decl(Parser *parser) {
-    Token fn_tok = previous(parser);
-    Token name_tok = consume(parser, TOKEN_IDENTIFIER, "expected function name after 'fn'");
+    Token task_tok = previous(parser);
+    Token name_tok = consume(parser, TOKEN_IDENTIFIER, "expected function name after 'task'");
     if (parser->panic_mode) return NULL;
 
     consume(parser, TOKEN_LPAREN, "expected '(' after function name");
@@ -409,53 +413,53 @@ static ASTNode *parse_func_decl(Parser *parser) {
     while (match(parser, TOKEN_NEWLINE) || match(parser, TOKEN_SEMICOLON));
 
     return ast_new_func_decl(mrt_strdup(name_tok.lexeme), params, param_count,
-                             body, fn_tok.line, fn_tok.column);
+                             body, task_tok.line, task_tok.column);
 }
 
-static ASTNode *parse_if(Parser *parser) {
-    Token if_tok = previous(parser);
+static ASTNode *parse_when(Parser *parser) {
+    Token when_tok = previous(parser);
     skip_newlines(parser);
 
     ASTNode *condition = parse_expression(parser);
     skip_newlines(parser);
 
-    Token lbrace = consume(parser, TOKEN_LBRACE, "expected '{' after if condition");
+    Token lbrace = consume(parser, TOKEN_LBRACE, "expected '{' after condition");
     ASTNode *then_branch = parse_block_body(parser, lbrace.line, lbrace.column);
 
     ASTNode *else_branch = NULL;
     skip_newlines(parser);
-    if (match(parser, TOKEN_ELSE)) {
+    if (match(parser, TOKEN_OTHERWISE)) {
         skip_newlines(parser);
-        if (match(parser, TOKEN_IF)) {
-            else_branch = parse_if(parser);
+        if (match(parser, TOKEN_WHEN)) {
+            else_branch = parse_when(parser);
         } else {
-            Token else_lbrace = consume(parser, TOKEN_LBRACE, "expected '{' after 'else'");
+            Token else_lbrace = consume(parser, TOKEN_LBRACE, "expected '{' after 'otherwise'");
             else_branch = parse_block_body(parser, else_lbrace.line, else_lbrace.column);
         }
     }
 
     while (match(parser, TOKEN_NEWLINE) || match(parser, TOKEN_SEMICOLON));
 
-    return ast_new_if(condition, then_branch, else_branch, if_tok.line, if_tok.column);
+    return ast_new_if(condition, then_branch, else_branch, when_tok.line, when_tok.column);
 }
 
-static ASTNode *parse_while(Parser *parser) {
-    Token while_tok = previous(parser);
+static ASTNode *parse_repeat(Parser *parser) {
+    Token rep_tok = previous(parser);
     skip_newlines(parser);
 
     ASTNode *condition = parse_expression(parser);
     skip_newlines(parser);
 
-    Token lbrace = consume(parser, TOKEN_LBRACE, "expected '{' after while condition");
+    Token lbrace = consume(parser, TOKEN_LBRACE, "expected '{' after repeat condition");
     ASTNode *body = parse_block_body(parser, lbrace.line, lbrace.column);
 
     while (match(parser, TOKEN_NEWLINE) || match(parser, TOKEN_SEMICOLON));
 
-    return ast_new_while(condition, body, while_tok.line, while_tok.column);
+    return ast_new_while(condition, body, rep_tok.line, rep_tok.column);
 }
 
-static ASTNode *parse_return(Parser *parser) {
-    Token ret_tok = previous(parser);
+static ASTNode *parse_give(Parser *parser) {
+    Token give_tok = previous(parser);
     ASTNode *value = NULL;
 
     if (!check(parser, TOKEN_NEWLINE) && !check(parser, TOKEN_SEMICOLON) &&
@@ -464,7 +468,27 @@ static ASTNode *parse_return(Parser *parser) {
     }
 
     consume_statement_separator(parser);
-    return ast_new_return(value, ret_tok.line, ret_tok.column);
+    return ast_new_return(value, give_tok.line, give_tok.column);
+}
+
+static ASTNode *parse_say(Parser *parser) {
+    Token say_tok = previous(parser);
+    skip_newlines(parser);
+    ASTNode *value = parse_expression(parser);
+    consume_statement_separator(parser);
+    return ast_new_say(value, say_tok.line, say_tok.column);
+}
+
+static ASTNode *parse_break(Parser *parser) {
+    Token tok = previous(parser);
+    consume_statement_separator(parser);
+    return ast_new_break(tok.line, tok.column);
+}
+
+static ASTNode *parse_continue(Parser *parser) {
+    Token tok = previous(parser);
+    consume_statement_separator(parser);
+    return ast_new_continue(tok.line, tok.column);
 }
 
 static ASTNode *parse_expr_statement(Parser *parser) {
@@ -476,17 +500,20 @@ static ASTNode *parse_expr_statement(Parser *parser) {
 }
 
 static ASTNode *parse_statement(Parser *parser) {
-    if (match(parser, TOKEN_IF)) return parse_if(parser);
-    if (match(parser, TOKEN_WHILE)) return parse_while(parser);
-    if (match(parser, TOKEN_RETURN)) return parse_return(parser);
+    if (match(parser, TOKEN_WHEN)) return parse_when(parser);
+    if (match(parser, TOKEN_REPEAT)) return parse_repeat(parser);
+    if (match(parser, TOKEN_GIVE)) return parse_give(parser);
+    if (match(parser, TOKEN_SAY)) return parse_say(parser);
+    if (match(parser, TOKEN_BREAK)) return parse_break(parser);
+    if (match(parser, TOKEN_CONTINUE)) return parse_continue(parser);
     if (check(parser, TOKEN_LBRACE)) return parse_block(parser);
 
     return parse_expr_statement(parser);
 }
 
 static ASTNode *parse_declaration(Parser *parser) {
-    if (match(parser, TOKEN_LET)) return parse_var_decl(parser);
-    if (match(parser, TOKEN_FN)) return parse_func_decl(parser);
+    if (match(parser, TOKEN_VAR)) return parse_var_decl(parser);
+    if (match(parser, TOKEN_TASK)) return parse_func_decl(parser);
 
     ASTNode *stmt = parse_statement(parser);
     if (parser->panic_mode) {

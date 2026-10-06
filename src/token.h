@@ -8,23 +8,34 @@ typedef enum {
     TOKEN_INT,
     TOKEN_FLOAT,
     TOKEN_STRING,
-    TOKEN_TRUE,
-    TOKEN_FALSE,
-    TOKEN_NULL,
+    TOKEN_YES,              /* yes */
+    TOKEN_NO,               /* no */
+    TOKEN_NONE,             /* none */
 
     /* Identifiers */
     TOKEN_IDENTIFIER,
 
     /* Keywords */
-    TOKEN_LET,
-    TOKEN_FN,
-    TOKEN_RETURN,
-    TOKEN_IF,
-    TOKEN_ELSE,
-    TOKEN_WHILE,
-    TOKEN_AND,
-    TOKEN_OR,
-    TOKEN_NOT,
+    TOKEN_VAR,              /* var */
+    TOKEN_TASK,             /* task */
+    TOKEN_GIVE,             /* give */
+    TOKEN_SAY,              /* say */
+    TOKEN_WHEN,             /* when */
+    TOKEN_OTHERWISE,        /* otherwise */
+    TOKEN_REPEAT,           /* repeat */
+    TOKEN_BREAK,            /* break */
+    TOKEN_CONTINUE,         /* continue */
+    TOKEN_AND,              /* and */
+    TOKEN_OR,               /* or */
+    TOKEN_NOT,              /* not */
+
+    /* Reserved future keywords */
+    TOKEN_USE,
+    TOKEN_FROM,
+    TOKEN_AS,
+    TOKEN_EACH,
+    TOKEN_IN,
+    TOKEN_TYPE,
 
     /* Operators */
     TOKEN_PLUS,             /* + */

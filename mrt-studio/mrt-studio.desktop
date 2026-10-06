@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=MRT Studio
+Comment=Native IDE for the MRT programming language
+Comment[tr]=MRT programlama dili için yerel IDE
+Exec=mrt-studio %F
+Icon=mrt-studio-icon
+Terminal=false
+Type=Application
+Categories=Development;IDE;
+MimeType=text/x-mrt;
+Keywords=MRT;IDE;Programming;Language;Editor;Development;
+StartupNotify=true
+StartupWMClass=mrt-studio

@@ -1,18 +1,18 @@
 // variables.mrt
-let yas = 22
-let oran = 3.14
-let isim = "Murat"
-let aktif = true
-let bos = null
+var yas = 22
+var oran = 3.14
+var isim = "Murat"
+var aktif = yes
+var bos = none
 
-print("İsim:", isim)
-print("Yaş:", yas)
-print("Oran:", oran)
-print("Aktif:", aktif)
-print("Boş:", bos)
+say "İsim: " + isim
+say "Yaş: " + toText(yas)
+say "Oran: " + toText(oran)
+say "Aktif: " + toText(aktif)
+say "Boş: " + toText(bos)
 
-print("typeof(yas):", typeof(yas))
-print("typeof(oran):", typeof(oran))
-print("typeof(isim):", typeof(isim))
-print("typeof(aktif):", typeof(aktif))
-print("typeof(bos):", typeof(bos))
+say "typeOf(yas): " + typeOf(yas)
+say "typeOf(oran): " + typeOf(oran)
+say "typeOf(isim): " + typeOf(isim)
+say "typeOf(aktif): " + typeOf(aktif)
+say "typeOf(bos): " + typeOf(bos)

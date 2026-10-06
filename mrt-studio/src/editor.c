@@ -1,4 +1,5 @@
 #include "editor.h"
+#include "i18n.h"
 
 struct MrtEditorManager {
     GtkNotebook *notebook;
@@ -7,6 +8,11 @@ struct MrtEditorManager {
     int untitled_counter;
     GtkSourceLanguage *mrt_language;
     GtkSourceStyleScheme *style_scheme;
+    MrtCursorChangedCallback cursor_cb;
+    gpointer cursor_cb_data;
+    MrtTabChangedCallback tab_cb;
+    gpointer tab_cb_data;
+    GtkTextBuffer *keywords_buffer;
 };
 
 static void update_tab_label(MrtEditorTab *tab) {
@@ -18,11 +24,28 @@ static void update_tab_label(MrtEditorTab *tab) {
 }
 
 static void on_buffer_changed(GtkTextBuffer *buf, gpointer user_data) {
-    (void)buf;
     MrtEditorTab *tab = (MrtEditorTab *)user_data;
+    MrtEditorManager *mgr = (MrtEditorManager *)g_object_get_data(G_OBJECT(buf), "mrt-editor-mgr");
     if (!tab->is_modified) {
         tab->is_modified = TRUE;
         update_tab_label(tab);
+    }
+    if (mgr && mgr->tab_cb) {
+        mgr->tab_cb(tab, mgr->tab_cb_data);
+    }
+}
+
+static void on_cursor_notify(GObject *gobject, GParamSpec *pspec, gpointer user_data) {
+    (void)pspec;
+    MrtEditorTab *tab = (MrtEditorTab *)g_object_get_data(gobject, "mrt-editor-tab");
+    MrtEditorManager *mgr = (MrtEditorManager *)user_data;
+    if (tab && mgr && mgr->cursor_cb) {
+        GtkTextIter iter;
+        GtkTextMark *insert_mark = gtk_text_buffer_get_insert(GTK_TEXT_BUFFER(tab->buffer));
+        gtk_text_buffer_get_iter_at_mark(GTK_TEXT_BUFFER(tab->buffer), &iter, insert_mark);
+        int line = gtk_text_iter_get_line(&iter) + 1;
+        int col = gtk_text_iter_get_line_offset(&iter) + 1;
+        mgr->cursor_cb(tab->display_name, line, col, mgr->cursor_cb_data);
     }
 }
 
@@ -104,6 +127,23 @@ static void apply_settings_to_tab(MrtEditorTab *tab, const MrtSettings *s) {
 
 static void on_tab_close_clicked(GtkButton *btn, gpointer user_data);
 
+static void on_notebook_switch_page(GtkNotebook *nb, GtkWidget *page, guint page_num, gpointer user_data) {
+    (void)nb; (void)page; (void)page_num;
+    MrtEditorManager *mgr = (MrtEditorManager *)user_data;
+    MrtEditorTab *cur = mrt_editor_manager_get_current_tab(mgr);
+    if (mgr->tab_cb) {
+        mgr->tab_cb(cur, mgr->tab_cb_data);
+    }
+    if (cur && mgr->cursor_cb) {
+        GtkTextIter iter;
+        GtkTextMark *insert_mark = gtk_text_buffer_get_insert(GTK_TEXT_BUFFER(cur->buffer));
+        gtk_text_buffer_get_iter_at_mark(GTK_TEXT_BUFFER(cur->buffer), &iter, insert_mark);
+        int line = gtk_text_iter_get_line(&iter) + 1;
+        int col = gtk_text_iter_get_line_offset(&iter) + 1;
+        mgr->cursor_cb(cur->display_name, line, col, mgr->cursor_cb_data);
+    }
+}
+
 static MrtEditorTab *create_editor_tab(MrtEditorManager *mgr, const char *title, GFile *file, const char *content) {
     MrtEditorTab *tab = g_new0(MrtEditorTab, 1);
     tab->file = file ? g_object_ref(file) : NULL;
@@ -124,13 +164,32 @@ static MrtEditorTab *create_editor_tab(MrtEditorManager *mgr, const char *title,
         gtk_text_buffer_set_modified(GTK_TEXT_BUFFER(tab->buffer), FALSE);
     }
 
+    g_object_set_data(G_OBJECT(tab->buffer), "mrt-editor-tab", tab);
+    g_object_set_data(G_OBJECT(tab->buffer), "mrt-editor-mgr", mgr);
     g_signal_connect(tab->buffer, "changed", G_CALLBACK(on_buffer_changed), tab);
+    g_signal_connect(tab->buffer, "notify::cursor-position", G_CALLBACK(on_cursor_notify), mgr);
 
     tab->source_view = gtk_source_view_new_with_buffer(tab->buffer);
     gtk_widget_set_hexpand(tab->source_view, TRUE);
     gtk_widget_set_vexpand(tab->source_view, TRUE);
 
     apply_settings_to_tab(tab, mgr->settings);
+
+    /* Completion: MRT Keywords and Snippets */
+    GtkSourceCompletion *comp = gtk_source_view_get_completion(GTK_SOURCE_VIEW(tab->source_view));
+    if (comp) {
+        GtkSourceCompletionWords *words = gtk_source_completion_words_new(_("MRT"));
+        gtk_source_completion_words_register(words, GTK_TEXT_BUFFER(tab->buffer));
+        if (mgr->keywords_buffer) {
+            gtk_source_completion_words_register(words, mgr->keywords_buffer);
+        }
+        gtk_source_completion_add_provider(comp, GTK_SOURCE_COMPLETION_PROVIDER(words));
+        g_object_unref(words);
+
+        GtkSourceCompletionSnippets *snippets = gtk_source_completion_snippets_new();
+        gtk_source_completion_add_provider(comp, GTK_SOURCE_COMPLETION_PROVIDER(snippets));
+        g_object_unref(snippets);
+    }
 
     /* Search settings */
     tab->search_settings = gtk_source_search_settings_new();
@@ -158,6 +217,14 @@ static MrtEditorTab *create_editor_tab(MrtEditorManager *mgr, const char *title,
     gtk_notebook_set_current_page(mgr->notebook, page_num);
 
     mgr->tabs = g_list_append(mgr->tabs, tab);
+
+    if (mgr->tab_cb) {
+        mgr->tab_cb(tab, mgr->tab_cb_data);
+    }
+    if (mgr->cursor_cb) {
+        mgr->cursor_cb(tab->display_name, 1, 1, mgr->cursor_cb_data);
+    }
+
     return tab;
 }
 
@@ -183,11 +250,23 @@ MrtEditorManager *mrt_editor_manager_new(GtkNotebook *notebook, MrtSettings *set
     mgr->settings = settings;
     mgr->untitled_counter = 1;
     init_language_and_scheme(mgr);
+
+    /* Keywords buffer for autocompletion */
+    mgr->keywords_buffer = gtk_text_buffer_new(NULL);
+    const char *kw = "task var give say when otherwise repeat break continue yes no none typeOf length toText clock";
+    gtk_text_buffer_set_text(mgr->keywords_buffer, kw, -1);
+
+    g_signal_connect(mgr->notebook, "switch-page", G_CALLBACK(on_notebook_switch_page), mgr);
+
     return mgr;
 }
 
 void mrt_editor_manager_free(MrtEditorManager *mgr) {
     if (!mgr) return;
+    if (mgr->keywords_buffer) {
+        g_object_unref(mgr->keywords_buffer);
+        mgr->keywords_buffer = NULL;
+    }
     GList *l = mgr->tabs;
     while (l) {
         MrtEditorTab *tab = (MrtEditorTab *)l->data;
@@ -196,6 +275,18 @@ void mrt_editor_manager_free(MrtEditorManager *mgr) {
     }
     g_list_free(mgr->tabs);
     g_free(mgr);
+}
+
+void mrt_editor_manager_set_cursor_callback(MrtEditorManager *mgr, MrtCursorChangedCallback cb, gpointer user_data) {
+    if (!mgr) return;
+    mgr->cursor_cb = cb;
+    mgr->cursor_cb_data = user_data;
+}
+
+void mrt_editor_manager_set_tab_changed_callback(MrtEditorManager *mgr, MrtTabChangedCallback cb, gpointer user_data) {
+    if (!mgr) return;
+    mgr->tab_cb = cb;
+    mgr->tab_cb_data = user_data;
 }
 
 MrtEditorTab *mrt_editor_manager_new_file(MrtEditorManager *mgr, const char *initial_content) {
@@ -333,8 +424,19 @@ static void do_close_tab(MrtEditorManager *mgr, MrtEditorTab *tab) {
     mgr->tabs = g_list_remove(mgr->tabs, tab);
     free_editor_tab(tab);
 
-    if (g_list_length(mgr->tabs) == 0) {
-        mrt_editor_manager_new_file(mgr, NULL);
+    MrtEditorTab *cur = mrt_editor_manager_get_current_tab(mgr);
+    if (mgr->tab_cb) {
+        mgr->tab_cb(cur, mgr->tab_cb_data);
+    }
+    if (cur && mgr->cursor_cb) {
+        GtkTextIter iter;
+        GtkTextMark *insert_mark = gtk_text_buffer_get_insert(GTK_TEXT_BUFFER(cur->buffer));
+        gtk_text_buffer_get_iter_at_mark(GTK_TEXT_BUFFER(cur->buffer), &iter, insert_mark);
+        int line = gtk_text_iter_get_line(&iter) + 1;
+        int col = gtk_text_iter_get_line_offset(&iter) + 1;
+        mgr->cursor_cb(cur->display_name, line, col, mgr->cursor_cb_data);
+    } else if (!cur && mgr->cursor_cb) {
+        mgr->cursor_cb("-", 1, 1, mgr->cursor_cb_data);
     }
 }
 
@@ -388,7 +490,7 @@ void mrt_editor_manager_close_tab(MrtEditorManager *mgr, MrtEditorTab *tab, GtkW
     data->tab = tab;
 
     GtkWidget *win = gtk_window_new();
-    gtk_window_set_title(GTK_WINDOW(win), "Unsaved Changes");
+    gtk_window_set_title(GTK_WINDOW(win), _("Unsaved Changes"));
     gtk_window_set_transient_for(GTK_WINDOW(win), parent);
     gtk_window_set_modal(GTK_WINDOW(win), TRUE);
     gtk_window_set_default_size(GTK_WINDOW(win), 380, 140);
@@ -401,10 +503,10 @@ void mrt_editor_manager_close_tab(MrtEditorManager *mgr, MrtEditorTab *tab, GtkW
     gtk_widget_set_margin_bottom(vbox, 16);
     gtk_window_set_child(GTK_WINDOW(win), vbox);
 
-    char msg[256];
-    snprintf(msg, sizeof(msg), "Save changes to \"%s\" before closing?",
-             tab->display_name ? tab->display_name : "untitled");
+    char *msg = g_strdup_printf(_("Save changes to \"%s\" before closing?"),
+                                tab->display_name ? tab->display_name : "untitled");
     GtkWidget *lbl = gtk_label_new(msg);
+    g_free(msg);
     gtk_label_set_wrap(GTK_LABEL(lbl), TRUE);
     gtk_box_append(GTK_BOX(vbox), lbl);
 
@@ -412,16 +514,16 @@ void mrt_editor_manager_close_tab(MrtEditorManager *mgr, MrtEditorTab *tab, GtkW
     gtk_widget_set_halign(btn_box, GTK_ALIGN_END);
     gtk_box_append(GTK_BOX(vbox), btn_box);
 
-    GtkWidget *btn_cancel = gtk_button_new_with_label("Cancel");
+    GtkWidget *btn_cancel = gtk_button_new_with_label(_("Cancel"));
     g_signal_connect(btn_cancel, "clicked", G_CALLBACK(on_close_cancel_clicked), data);
     gtk_box_append(GTK_BOX(btn_box), btn_cancel);
 
-    GtkWidget *btn_discard = gtk_button_new_with_label("Don't Save");
+    GtkWidget *btn_discard = gtk_button_new_with_label(_("Don't Save"));
     gtk_widget_add_css_class(btn_discard, "destructive-action");
     g_signal_connect(btn_discard, "clicked", G_CALLBACK(on_close_discard_clicked), data);
     gtk_box_append(GTK_BOX(btn_box), btn_discard);
 
-    GtkWidget *btn_save = gtk_button_new_with_label("Save");
+    GtkWidget *btn_save = gtk_button_new_with_label(_("Save"));
     gtk_widget_add_css_class(btn_save, "suggested-action");
     g_signal_connect(btn_save, "clicked", G_CALLBACK(on_close_save_clicked), data);
     gtk_box_append(GTK_BOX(btn_box), btn_save);
@@ -545,5 +647,100 @@ void mrt_editor_tab_undo(MrtEditorTab *tab) {
 void mrt_editor_tab_redo(MrtEditorTab *tab) {
     if (tab && tab->buffer && gtk_text_buffer_get_can_redo(GTK_TEXT_BUFFER(tab->buffer))) {
         gtk_text_buffer_redo(GTK_TEXT_BUFFER(tab->buffer));
+    }
+}
+
+typedef struct {
+    MrtEditorManager *mgr;
+    GtkWindow *dialog;
+    GtkEntry *entry;
+} GotoLineData;
+
+static void on_goto_submit(GtkButton *btn, gpointer user_data) {
+    (void)btn;
+    GotoLineData *data = (GotoLineData *)user_data;
+    const char *text = gtk_editable_get_text(GTK_EDITABLE(data->entry));
+    int line = text ? atoi(text) : 1;
+    if (line < 1) line = 1;
+    mrt_editor_manager_goto_line_col(data->mgr, NULL, line, 1);
+    gtk_window_destroy(data->dialog);
+    g_free(data);
+}
+
+static void on_goto_cancel(GtkButton *btn, gpointer user_data) {
+    (void)btn;
+    GotoLineData *data = (GotoLineData *)user_data;
+    gtk_window_destroy(data->dialog);
+    g_free(data);
+}
+
+void mrt_editor_manager_goto_line_dialog(MrtEditorManager *mgr, GtkWindow *parent) {
+    if (!mgr) return;
+    GotoLineData *data = g_new0(GotoLineData, 1);
+    data->mgr = mgr;
+
+    GtkWidget *win = gtk_window_new();
+    gtk_window_set_title(GTK_WINDOW(win), _("Go to Line"));
+    gtk_window_set_transient_for(GTK_WINDOW(win), parent);
+    gtk_window_set_modal(GTK_WINDOW(win), TRUE);
+    gtk_window_set_default_size(GTK_WINDOW(win), 320, 120);
+    data->dialog = GTK_WINDOW(win);
+
+    GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
+    gtk_widget_set_margin_start(vbox, 16);
+    gtk_widget_set_margin_end(vbox, 16);
+    gtk_widget_set_margin_top(vbox, 16);
+    gtk_widget_set_margin_bottom(vbox, 16);
+    gtk_window_set_child(GTK_WINDOW(win), vbox);
+
+    GtkWidget *lbl = gtk_label_new(_("Line number:"));
+    gtk_widget_set_halign(lbl, GTK_ALIGN_START);
+    gtk_box_append(GTK_BOX(vbox), lbl);
+
+    data->entry = GTK_ENTRY(gtk_entry_new());
+    gtk_editable_set_text(GTK_EDITABLE(data->entry), "1");
+    g_signal_connect_swapped(data->entry, "activate", G_CALLBACK(on_goto_submit), data);
+    gtk_box_append(GTK_BOX(vbox), GTK_WIDGET(data->entry));
+
+    GtkWidget *btn_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 8);
+    gtk_widget_set_halign(btn_box, GTK_ALIGN_END);
+    gtk_box_append(GTK_BOX(vbox), btn_box);
+
+    GtkWidget *btn_cancel = gtk_button_new_with_label(_("Cancel"));
+    g_signal_connect(btn_cancel, "clicked", G_CALLBACK(on_goto_cancel), data);
+    gtk_box_append(GTK_BOX(btn_box), btn_cancel);
+
+    GtkWidget *btn_go = gtk_button_new_with_label(_("Go"));
+    gtk_widget_add_css_class(btn_go, "suggested-action");
+    g_signal_connect(btn_go, "clicked", G_CALLBACK(on_goto_submit), data);
+    gtk_box_append(GTK_BOX(btn_box), btn_go);
+
+    gtk_window_present(GTK_WINDOW(win));
+    gtk_widget_grab_focus(GTK_WIDGET(data->entry));
+}
+
+char *mrt_editor_manager_get_current_text(MrtEditorManager *mgr) {
+    MrtEditorTab *cur = mrt_editor_manager_get_current_tab(mgr);
+    if (!cur || !cur->buffer) return NULL;
+    GtkTextIter start, end;
+    gtk_text_buffer_get_bounds(GTK_TEXT_BUFFER(cur->buffer), &start, &end);
+    return gtk_text_buffer_get_text(GTK_TEXT_BUFFER(cur->buffer), &start, &end, FALSE);
+}
+
+GList *mrt_editor_manager_get_tabs(MrtEditorManager *mgr) {
+    return mgr ? mgr->tabs : NULL;
+}
+
+int mrt_editor_manager_get_tab_count(MrtEditorManager *mgr) {
+    return mgr ? g_list_length(mgr->tabs) : 0;
+}
+
+void mrt_editor_manager_save_all(MrtEditorManager *mgr, GtkWindow *parent) {
+    if (!mgr) return;
+    for (GList *l = mgr->tabs; l; l = l->next) {
+        MrtEditorTab *tab = (MrtEditorTab *)l->data;
+        if (tab->is_modified) {
+            mrt_editor_manager_save_tab(mgr, tab, parent, NULL, NULL);
+        }
     }
 }
