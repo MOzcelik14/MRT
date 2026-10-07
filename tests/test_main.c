@@ -411,6 +411,50 @@ static void test_builtins(void) {
     ASSERT(r4.value.type == VAL_STRING);
     ASSERT(strcmp(r4.value.as.string_val->chars, "456") == 0);
     value_release(r4.value);
+
+    // toNumber tests
+    EvalResult r5 = run_code("toNumber(\"123\")");
+    ASSERT(r5.status == INTERP_OK);
+    ASSERT(r5.value.type == VAL_INT);
+    ASSERT(r5.value.as.int_val == 123);
+    value_release(r5.value);
+
+    EvalResult r6 = run_code("toNumber(\"-45\")");
+    ASSERT(r6.status == INTERP_OK);
+    ASSERT(r6.value.type == VAL_INT);
+    ASSERT(r6.value.as.int_val == -45);
+    value_release(r6.value);
+
+    EvalResult r7 = run_code("toNumber(\"3.14\")");
+    ASSERT(r7.status == INTERP_OK);
+    ASSERT(r7.value.type == VAL_FLOAT);
+    ASSERT(r7.value.as.float_val > 3.13 && r7.value.as.float_val < 3.15);
+    value_release(r7.value);
+
+    EvalResult r8 = run_code("toNumber(99)");
+    ASSERT(r8.status == INTERP_OK);
+    ASSERT(r8.value.type == VAL_INT);
+    ASSERT(r8.value.as.int_val == 99);
+    value_release(r8.value);
+
+    EvalResult r9 = run_code("toNumber(yes)");
+    ASSERT(r9.status == INTERP_OK);
+    ASSERT(r9.value.type == VAL_INT);
+    ASSERT(r9.value.as.int_val == 1);
+    value_release(r9.value);
+
+    // read and toNumber function existence
+    EvalResult r_fn1 = run_code("typeOf(read)");
+    ASSERT(r_fn1.status == INTERP_OK);
+    ASSERT(r_fn1.value.type == VAL_STRING);
+    ASSERT(strcmp(r_fn1.value.as.string_val->chars, "function") == 0);
+    value_release(r_fn1.value);
+
+    EvalResult r_fn2 = run_code("typeOf(toNumber)");
+    ASSERT(r_fn2.status == INTERP_OK);
+    ASSERT(r_fn2.value.type == VAL_STRING);
+    ASSERT(strcmp(r_fn2.value.as.string_val->chars, "function") == 0);
+    value_release(r_fn2.value);
 }
 
 static void test_errors(void) {
@@ -429,6 +473,16 @@ static void test_errors(void) {
     // Type error with length
     EvalResult r_len = run_code("length(100)");
     ASSERT(r_len.status == INTERP_ERROR);
+
+    // Type error with toNumber invalid string
+    EvalResult r_num1 = run_code("toNumber(\"abc\")");
+    ASSERT(r_num1.status == INTERP_ERROR);
+
+    EvalResult r_num2 = run_code("toNumber(\"\")");
+    ASSERT(r_num2.status == INTERP_ERROR);
+
+    EvalResult r_read_err = run_code("read(\"a\", \"b\")");
+    ASSERT(r_read_err.status == INTERP_ERROR);
 
     // Division by zero
     EvalResult r_div = run_code("10 / 0");

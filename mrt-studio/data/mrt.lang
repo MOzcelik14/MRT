@@ -81,6 +81,8 @@
       <keyword>length</keyword>
       <keyword>toText</keyword>
       <keyword>clock</keyword>
+      <keyword>read</keyword>
+      <keyword>toNumber</keyword>
     </context>
 
     <context id="function-declaration">

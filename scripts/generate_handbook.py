@@ -321,7 +321,7 @@ def build_pdf(filename="docs/MRT_El_Kitabi.pdf"):
         ("5. Konsol Çıktısı: 'say' Deyimi", "say <ifade> deyiminin doğası, otomatik satır sonu ve birinci sınıf dil yapısı."),
         ("6. Kontrol Akışı (when, otherwise, repeat)", "when/otherwise blokları, repeat döngüsü, break ve continue akış kontrolü."),
         ("7. Görevler (Tasks / Fonksiyonlar)", "task tanımları, give deyimi, sözcüksel kapsam (lexical scope) ve özyineleme."),
-        ("8. Yerleşik Standart Kütüphane", "typeOf, length, toText ve clock fonksiyonlarının kullanımı ve dönüş tipleri."),
+        ("8. Yerleşik Standart Kütüphane", "read, toNumber, toText, typeOf, length ve clock fonksiyonlarının kullanımı ve tipleri."),
         ("9. Hata Yönetimi ve Tanılama", "SyntaxError, NameError, TypeError, RuntimeError ve imleçli görsel hata işaretçileri."),
         ("10. MRT Studio IDE Kılavuzu", "GTK4 yerel arayüzü, çift dilli destek, komut paleti, sembol ağacı ve kurtarma."),
         ("11. Dil Mimarisi ve Gelecek Yol Haritası", "Lexer -> Parser -> AST -> Interpreter ardışık düzeni ve gelecek hedefler."),
@@ -687,6 +687,21 @@ say "fib(10) = " + toText(fib(10))   // 55
     builtins_data = [
         [Paragraph("Fonksiyon", styles["TableHead"]), Paragraph("Dönüş Tipi", styles["TableHead"]), Paragraph("Açıklama ve Kullanım Örneği", styles["TableHead"])],
         [
+            Paragraph("read([mesaj])", styles["TableCellCode"]),
+            Paragraph("string / none", styles["TableCell"]),
+            Paragraph("Standart girdiden (stdin) bir satır okur. İsteğe bağlı olarak ekrana istem mesajı basar. Dosya sonu (EOF) durumunda <code>none</code> döner.", styles["TableCell"])
+        ],
+        [
+            Paragraph("toNumber(değer)", styles["TableCellCode"]),
+            Paragraph("integer / float", styles["TableCell"]),
+            Paragraph("Metin, tam sayı, ondalık veya mantıksal değeri sayıya dönüştürür. Geçersiz metinlerde tip hatası üretir.", styles["TableCell"])
+        ],
+        [
+            Paragraph("toText(değer)", styles["TableCellCode"]),
+            Paragraph("string", styles["TableCell"]),
+            Paragraph("Herhangi bir değeri metne dönüştürür. Sayılarla dizgeleri birleştirirken kullanılır.", styles["TableCell"])
+        ],
+        [
             Paragraph("typeOf(değer)", styles["TableCellCode"]),
             Paragraph("string", styles["TableCell"]),
             Paragraph("Verilen değerin tip adını metin olarak döner: <code>\"integer\"</code>, <code>\"float\"</code>, <code>\"string\"</code>, <code>\"boolean\"</code>, <code>\"none\"</code>, <code>\"function\"</code>.", styles["TableCell"])
@@ -695,11 +710,6 @@ say "fib(10) = " + toText(fib(10))   // 55
             Paragraph("length(metin)", styles["TableCellCode"]),
             Paragraph("integer", styles["TableCell"]),
             Paragraph("Verilen dizgenin karakter sayısını döner: <code>length(\"MRT\") -> 3</code>.", styles["TableCell"])
-        ],
-        [
-            Paragraph("toText(değer)", styles["TableCellCode"]),
-            Paragraph("string", styles["TableCell"]),
-            Paragraph("Herhangi bir değeri metne dönüştürür. Sayılarla dizgeleri birleştirirken kullanılır.", styles["TableCell"])
         ],
         [
             Paragraph("clock()", styles["TableCellCode"]),
@@ -713,12 +723,22 @@ say "fib(10) = " + toText(fib(10))   // 55
         ('BOX', (0, 0), (-1, -1), 1, COLOR_BORDER),
         ('INNERGRID', (0, 0), (-1, -1), 0.5, COLOR_BORDER),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, COLOR_BG_LIGHT]),
-        ('TOPPADDING', (0, 0), (-1, -1), 6),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 5),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
         ('LEFTPADDING', (0, 0), (-1, -1), 8),
         ('RIGHTPADDING', (0, 0), (-1, -1), 8),
     ]))
     story.append(builtins_table)
+
+    story.append(Spacer(1, 3 * mm))
+    story.append(Paragraph("Kullanıcıdan Girdi Alma Örneği:", styles["SubSectionHeading"]))
+    story.append(make_code_block("""// Kullanıcı etkileşimi: read() ve toNumber()
+var isim = read("Adınız: ")
+say "Merhaba, " + isim + "!"
+
+var yas = toNumber(read("Yaşınız: "))
+say "Gelecek yıl yaşınız: " + toText(yas + 1)
+""", styles))
 
     story.append(PageBreak())
 
@@ -831,7 +851,7 @@ RuntimeError: division by zero
   [ Interpreter ]   --> AST Tree-Walking Çalıştırma Motoru (src/interpreter.c)
     ├── Environment --> Sözcüksel Kapsam Zinciri (src/environment.c)
     ├── Value       --> Referans Sayımlı Tagged Union (src/value.c)
-    └── Builtins    --> typeOf, length, toText, clock (src/builtin.c)
+    └── Builtins    --> typeOf, length, toText, read, toNumber, clock (src/builtin.c)
 """, styles))
 
     story.append(Paragraph("Gelecek Yol Haritası (Roadmap):", styles["SubSectionHeading"]))
@@ -857,8 +877,10 @@ var aktif = yes
 var pasif = no
 var bos = none
 
-// 2. Konsola Yazdırma
+// 2. Konsola Yazdırma ve Kullanıcı Girdisi
 say "Sayı: " + toText(tamsayi)
+var isim = read("Adınız: ")
+var yas = toNumber(read("Yaş: "))
 
 // 3. Koşul Yapısı
 when tamsayi > 50 {

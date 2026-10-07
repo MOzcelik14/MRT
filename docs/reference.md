@@ -39,7 +39,9 @@ Precedence levels from lowest to highest:
 ## Built-in Functions & Statements
 
 - `say <expr>`: Output statement that evaluates an expression and prints it to stdout followed by a newline.
+- `read([prompt])`: Reads a line from standard input (stdin) as a string. If an optional prompt is provided, it is printed before reading. Returns `none` on EOF.
+- `toNumber(val)`: Converts string, integer, float, or boolean to a numeric value (`integer` or `float`). Reports a type error if string format is invalid.
+- `toText(val)`: Converts any value into a string representation.
 - `typeOf(val)`: Returns `"integer"`, `"float"`, `"string"`, `"boolean"`, `"none"`, or `"function"`.
 - `length(str)`: Returns the integer character count of a string.
-- `toText(val)`: Converts any value into a string representation.
 - `clock()`: Returns process execution time in seconds as a float.

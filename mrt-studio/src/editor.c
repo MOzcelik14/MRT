@@ -253,7 +253,7 @@ MrtEditorManager *mrt_editor_manager_new(GtkNotebook *notebook, MrtSettings *set
 
     /* Keywords buffer for autocompletion */
     mgr->keywords_buffer = gtk_text_buffer_new(NULL);
-    const char *kw = "task var give say when otherwise repeat break continue yes no none typeOf length toText clock";
+    const char *kw = "task var give say when otherwise repeat break continue yes no none typeOf length toText clock read toNumber";
     gtk_text_buffer_set_text(mgr->keywords_buffer, kw, -1);
 
     g_signal_connect(mgr->notebook, "switch-page", G_CALLBACK(on_notebook_switch_page), mgr);

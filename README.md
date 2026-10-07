@@ -53,7 +53,7 @@ MRT features its own distinctive, clean syntax:
 * **Loops & Control Flow:** `repeat (counter < 10) { ... }`, with `break` and `continue`
 * **Literals:** `yes` (true), `no` (false), `none` (null / void)
 * **Comments:** `// single-line` and `/* multi-line block */`
-* **Standard Builtins:** `typeOf(v)`, `length(s)`, `toText(v)`, `clock()`
+* **Standard Builtins:** `read([prompt])`, `toNumber(v)`, `toText(v)`, `typeOf(v)`, `length(s)`, `clock()`
 
 ### Example Code
 
@@ -199,7 +199,7 @@ MRT 0.2.0 sürümü ile birlikte dile özgün ve akıcı bir kimlik kazandırıl
 * **Döngüler:** `repeat (sayac < 10) { ... }`, `break` ve `continue` destekli
 * **Değer Sabitleri:** `yes` (doğru), `no` (yanlış), `none` (boş/yokluk)
 * **Yorum Satırları:** `// tek satır` ve `/* çok satırlı blok */`
-* **Yerleşik İşlevler:** `typeOf(d)`, `length(metin)`, `toText(d)`, `clock()`
+* **Yerleşik İşlevler:** `read([mesaj])`, `toNumber(d)`, `toText(d)`, `typeOf(d)`, `length(metin)`, `clock()`
 
 ### Örnek Kod
 

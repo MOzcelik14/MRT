@@ -1,0 +1,16 @@
+// input.mrt - MRT 0.2.0 Kullanıcı Girdisi ve Tip Dönüşümü
+
+say "=== MRT Kullanıcı Etkileşim Örneği ==="
+
+var ad = read("Lütfen adınızı girin: ")
+say "Merhaba, " + ad + "!"
+
+var yasMetin = read("Yaşınızı girin: ")
+var yas = toNumber(yasMetin)
+
+say "Gelecek yıl yaşınız: " + toText(yas + 1)
+when yas >= 18 {
+    say "Reşitsiniz."
+} otherwise {
+    say "Henüz reşit değilsiniz."
+}
