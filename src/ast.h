@@ -10,17 +10,23 @@ typedef enum {
     AST_VAR_DECL,
     AST_ASSIGN,
     AST_LITERAL,
+    AST_ARRAY_LITERAL,
+    AST_MAP_LITERAL,
     AST_IDENTIFIER,
     AST_BINARY,
     AST_UNARY,
     AST_FUNCTION_DECL,
     AST_FUNCTION_CALL,
+    AST_INDEX_GET,
+    AST_INDEX_SET,
     AST_IF,
     AST_WHILE,
+    AST_EACH,
     AST_RETURN,
     AST_SAY,
     AST_BREAK,
     AST_CONTINUE,
+    AST_USE,
     AST_EXPR_STMT
 } ASTNodeType;
 
@@ -71,6 +77,19 @@ struct ASTNode {
             } as;
         } literal;
 
+        /* AST_ARRAY_LITERAL */
+        struct {
+            ASTNode **elements;
+            size_t count;
+        } array_literal;
+
+        /* AST_MAP_LITERAL */
+        struct {
+            char **keys;
+            ASTNode **values;
+            size_t count;
+        } map_literal;
+
         /* AST_IDENTIFIER */
         struct {
             char *name;
@@ -104,6 +123,19 @@ struct ASTNode {
             size_t arg_count;
         } func_call;
 
+        /* AST_INDEX_GET */
+        struct {
+            ASTNode *target;
+            ASTNode *index;
+        } index_get;
+
+        /* AST_INDEX_SET */
+        struct {
+            ASTNode *target;
+            ASTNode *index;
+            ASTNode *value;
+        } index_set;
+
         /* AST_IF */
         struct {
             ASTNode *condition;
@@ -117,6 +149,13 @@ struct ASTNode {
             ASTNode *body;
         } while_stmt;
 
+        /* AST_EACH */
+        struct {
+            char *var_name;
+            ASTNode *collection;
+            ASTNode *body;
+        } each_stmt;
+
         /* AST_RETURN */
         struct {
             ASTNode *value; /* can be NULL */
@@ -126,6 +165,11 @@ struct ASTNode {
         struct {
             ASTNode *value;
         } say_stmt;
+
+        /* AST_USE */
+        struct {
+            char *path;
+        } use_stmt;
 
         /* AST_EXPR_STMT */
         struct {
@@ -151,6 +195,9 @@ ASTNode *ast_new_literal_bool(bool val, int line, int col);
 ASTNode *ast_new_literal_none(int line, int col);
 ASTNode *ast_new_literal_null(int line, int col);
 
+ASTNode *ast_new_array_literal(ASTNode **elements, size_t count, int line, int col);
+ASTNode *ast_new_map_literal(char **keys, ASTNode **values, size_t count, int line, int col);
+
 ASTNode *ast_new_identifier(char *name, int line, int col);
 ASTNode *ast_new_binary(TokenType op, ASTNode *left, ASTNode *right, int line, int col);
 ASTNode *ast_new_unary(TokenType op, ASTNode *operand, int line, int col);
@@ -158,12 +205,17 @@ ASTNode *ast_new_unary(TokenType op, ASTNode *operand, int line, int col);
 ASTNode *ast_new_func_decl(char *name, char **params, size_t param_count, ASTNode *body, int line, int col);
 ASTNode *ast_new_func_call(ASTNode *callee, ASTNode **args, size_t arg_count, int line, int col);
 
+ASTNode *ast_new_index_get(ASTNode *target, ASTNode *index, int line, int col);
+ASTNode *ast_new_index_set(ASTNode *target, ASTNode *index, ASTNode *value, int line, int col);
+
 ASTNode *ast_new_if(ASTNode *condition, ASTNode *then_branch, ASTNode *else_branch, int line, int col);
 ASTNode *ast_new_while(ASTNode *condition, ASTNode *body, int line, int col);
+ASTNode *ast_new_each(char *var_name, ASTNode *collection, ASTNode *body, int line, int col);
 ASTNode *ast_new_return(ASTNode *value, int line, int col);
 ASTNode *ast_new_say(ASTNode *value, int line, int col);
 ASTNode *ast_new_break(int line, int col);
 ASTNode *ast_new_continue(int line, int col);
+ASTNode *ast_new_use(char *path, int line, int col);
 ASTNode *ast_new_expr_stmt(ASTNode *expr, int line, int col);
 
 /* AST Destructor */

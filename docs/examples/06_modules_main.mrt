@@ -1,0 +1,6 @@
+// docs/examples/06_modules_main.mrt
+use "06_modules_math.mrt"
+
+say "Modül: " + mod_adi
+say "4'ün karesi: " + toText(kare(4))
+say "3'ün küpü: " + toText(kup(3))

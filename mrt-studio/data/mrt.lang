@@ -82,7 +82,15 @@
       <keyword>toText</keyword>
       <keyword>clock</keyword>
       <keyword>read</keyword>
+      <keyword>number</keyword>
       <keyword>toNumber</keyword>
+      <keyword>append</keyword>
+      <keyword>remove</keyword>
+      <keyword>contains</keyword>
+      <keyword>keys</keyword>
+      <keyword>values</keyword>
+      <keyword>range</keyword>
+      <keyword>assert</keyword>
     </context>
 
     <context id="function-declaration">

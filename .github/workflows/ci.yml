@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        compiler: [gcc, clang]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            clang \
+            libgtk-4-dev \
+            libgtksourceview-5-dev \
+            ninja-build \
+            meson \
+            valgrind
+
+      - name: Build and Run Tests (Makefile, ${{ matrix.compiler }})
+        env:
+          CC: ${{ matrix.compiler }}
+        run: |
+          make clean
+          make test
+          make
+
+      - name: Test CLI Commands
+        run: |
+          ./mrt version
+          ./mrt help
+          ./mrt run examples/hello.mrt
+          ./mrt check examples/hello.mrt
+          ./mrt check --diagnostics=json examples/hello.mrt
+          ./mrt inspect --symbols examples/functions.mrt
+          ./mrt inspect --symbols --json examples/functions.mrt
+
+      - name: Build with Meson and Ninja
+        env:
+          CC: ${{ matrix.compiler }}
+        run: |
+          meson setup build
+          meson compile -C build
+          meson test -C build --verbose
+
+      - name: Build MRT Studio
+        run: |
+          make studio

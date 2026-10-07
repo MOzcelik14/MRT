@@ -1,0 +1,9 @@
+// docs/examples/02_variables.mrt
+var age = 25
+var pi = 3.14159
+var is_active = yes
+var empty_val = none
+var title = "MRT Studio"
+
+say "Yaş: " + toText(age)
+say "Aktif mi: " + toText(is_active)

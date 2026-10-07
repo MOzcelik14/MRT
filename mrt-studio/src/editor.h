@@ -48,5 +48,6 @@ void mrt_editor_manager_goto_line_dialog(MrtEditorManager *mgr, GtkWindow *paren
 
 void mrt_editor_tab_undo(MrtEditorTab *tab);
 void mrt_editor_tab_redo(MrtEditorTab *tab);
+void mrt_editor_manager_format_current(MrtEditorManager *mgr, const char *mrt_bin);
 
 #endif /* MRT_EDITOR_H */

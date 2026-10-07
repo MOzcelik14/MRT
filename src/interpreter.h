@@ -20,6 +20,15 @@ typedef struct {
     Value value;
 } EvalResult;
 
+typedef struct CallFrame {
+    const char *task_name;
+    const char *filename;
+    int line;
+    int col;
+} CallFrame;
+
+#define MAX_CALL_FRAMES 256
+
 typedef struct Interpreter {
     Environment *globals;
     Environment *environment;
@@ -27,6 +36,22 @@ typedef struct Interpreter {
     const char *filename;
     bool had_runtime_error;
     bool owns_globals;
+
+    /* Call stack for diagnostics */
+    CallFrame frames[MAX_CALL_FRAMES];
+    size_t frame_count;
+
+    /* Module resolution tracking */
+    char **loaded_modules;
+    size_t loaded_count;
+    size_t loaded_cap;
+    char **loading_modules;
+    size_t loading_count;
+    size_t loading_cap;
+    struct ASTNode **module_asts;
+    char **module_sources;
+    size_t module_ast_count;
+    size_t module_ast_cap;
 } Interpreter;
 
 void interpreter_init(Interpreter *interp, const char *source, const char *filename);

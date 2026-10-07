@@ -13,6 +13,8 @@
 #include "../src/environment.h"
 #include "../src/interpreter.h"
 #include "../src/builtin.h"
+#include "../src/formatter.h"
+#include "../src/inspector.h"
 
 static int tests_run = 0;
 static int tests_passed = 0;
@@ -492,6 +494,200 @@ static void test_errors(void) {
     ASSERT(r_mod.status == INTERP_ERROR);
 }
 
+static void test_arrays(void) {
+    // Array literals and index access
+    EvalResult r1 = run_code("var a = [10, 20, 30]\ngive a[1]");
+    ASSERT(r1.status == INTERP_OK);
+    ASSERT(r1.value.type == VAL_INT);
+    ASSERT(r1.value.as.int_val == 20);
+    value_release(r1.value);
+
+    // Array mutation
+    EvalResult r2 = run_code("var a = [1, 2, 3]\na[0] = 99\ngive a[0]");
+    ASSERT(r2.status == INTERP_OK);
+    ASSERT(r2.value.type == VAL_INT);
+    ASSERT(r2.value.as.int_val == 99);
+    value_release(r2.value);
+
+    // Array concatenation
+    EvalResult r3 = run_code("var a = [1, 2] + [3, 4]\ngive length(a)");
+    ASSERT(r3.status == INTERP_OK);
+    ASSERT(r3.value.type == VAL_INT);
+    ASSERT(r3.value.as.int_val == 4);
+    value_release(r3.value);
+
+    // append, remove, contains
+    EvalResult r4 = run_code(
+        "var a = [10, 20]\n"
+        "append(a, 30)\n"
+        "var has30 = contains(a, 30)\n"
+        "var rem = remove(a, 1)\n"
+        "give has30 and rem == 20 and length(a) == 2"
+    );
+    ASSERT(r4.status == INTERP_OK);
+    ASSERT(r4.value.type == VAL_BOOL);
+    ASSERT(r4.value.as.bool_val == true);
+    value_release(r4.value);
+}
+
+static void test_maps(void) {
+    // Map literals and indexing
+    EvalResult r1 = run_code(
+        "var m = {\"name\": \"MRT\", \"ver\": 2}\n"
+        "give m[\"name\"]"
+    );
+    ASSERT(r1.status == INTERP_OK);
+    ASSERT(r1.value.type == VAL_STRING);
+    ASSERT(strcmp(r1.value.as.string_val->chars, "MRT") == 0);
+    value_release(r1.value);
+
+    // Map mutation and keys/values
+    EvalResult r2 = run_code(
+        "var m = {\"a\": 10}\n"
+        "m[\"b\"] = 20\n"
+        "var ks = keys(m)\n"
+        "var vs = values(m)\n"
+        "give length(ks) == 2 and contains(m, \"b\")"
+    );
+    ASSERT(r2.status == INTERP_OK);
+    ASSERT(r2.value.type == VAL_BOOL);
+    ASSERT(r2.value.as.bool_val == true);
+    value_release(r2.value);
+
+    // Map remove
+    EvalResult r3 = run_code(
+        "var m = {\"x\": 100, \"y\": 200}\n"
+        "var old = remove(m, \"x\")\n"
+        "give old == 100 and length(m) == 1 and not contains(m, \"x\")"
+    );
+    ASSERT(r3.status == INTERP_OK);
+    ASSERT(r3.value.type == VAL_BOOL);
+    ASSERT(r3.value.as.bool_val == true);
+    value_release(r3.value);
+}
+
+static void test_each_loops(void) {
+    // each in array
+    EvalResult r1 = run_code(
+        "var sum = 0\n"
+        "each x in [1, 2, 3, 4] {\n"
+        "    sum = sum + x\n"
+        "}\n"
+        "give sum"
+    );
+    ASSERT(r1.status == INTERP_OK);
+    ASSERT(r1.value.type == VAL_INT);
+    ASSERT(r1.value.as.int_val == 10);
+    value_release(r1.value);
+
+    // each in range with break and continue
+    EvalResult r2 = run_code(
+        "var total = 0\n"
+        "each i in range(1, 10) {\n"
+        "    when i == 3 { continue }\n"
+        "    when i == 6 { break }\n"
+        "    total = total + i\n"
+        "}\n"
+        "give total" // 1 + 2 + 4 + 5 = 12
+    );
+    ASSERT(r2.status == INTERP_OK);
+    ASSERT(r2.value.type == VAL_INT);
+    ASSERT(r2.value.as.int_val == 12);
+    value_release(r2.value);
+
+    // each in string
+    EvalResult r3 = run_code(
+        "var count = 0\n"
+        "each ch in \"hello\" {\n"
+        "    count = count + 1\n"
+        "}\n"
+        "give count"
+    );
+    ASSERT(r3.status == INTERP_OK);
+    ASSERT(r3.value.type == VAL_INT);
+    ASSERT(r3.value.as.int_val == 5);
+    value_release(r3.value);
+}
+
+static void test_modules_use(void) {
+    // Write temporary helper module
+    FILE *f = fopen("/tmp/mrt_test_math.mrt", "w");
+    ASSERT(f != NULL);
+    fputs("task add(a, b) { give a + b }\nvar answer = 42\n", f);
+    fclose(f);
+
+    EvalResult r = run_code(
+        "use \"/tmp/mrt_test_math.mrt\"\n"
+        "give add(answer, 8)"
+    );
+    ASSERT(r.status == INTERP_OK);
+    ASSERT(r.value.type == VAL_INT);
+    ASSERT(r.value.as.int_val == 50);
+    value_release(r.value);
+
+    remove("/tmp/mrt_test_math.mrt");
+}
+
+static void test_assert_builtin(void) {
+    EvalResult r_ok = run_code("assert(10 > 5, \"ten should be greater than 5\")\ngive yes");
+    ASSERT(r_ok.status == INTERP_OK);
+    ASSERT(r_ok.value.type == VAL_BOOL);
+    ASSERT(r_ok.value.as.bool_val == true);
+    value_release(r_ok.value);
+
+    EvalResult r_fail = run_code("assert(10 < 5, \"ten is not less than 5\")");
+    ASSERT(r_fail.status == INTERP_ERROR);
+}
+
+static void test_formatter(void) {
+    const char *code = "task foo(x,y){var z=x+y;when z>10{give yes}otherwise{give no}}";
+    Lexer lexer;
+    lexer_init(&lexer, code, "test.mrt");
+    TokenArray tokens = lexer_tokenize_all(&lexer);
+    Parser parser;
+    parser_init(&parser, tokens, code, "test.mrt");
+    ASTNode *ast = parser_parse(&parser);
+    ASSERT(ast != NULL);
+
+    char *formatted = mrt_format_ast(ast);
+    ASSERT(formatted != NULL);
+    ASSERT(strstr(formatted, "task foo(x, y) {\n") != NULL);
+    ASSERT(strstr(formatted, "    var z = x + y\n") != NULL);
+    ASSERT(strstr(formatted, "    when z > 10 {\n") != NULL);
+
+    mrt_free(formatted);
+    ast_free(ast);
+    parser_free(&parser);
+}
+
+static void test_inspector(void) {
+    const char *code = "var a = 1\ntask my_func(p1, p2) { var b = 2 }\nvar c = 3";
+    Lexer lexer;
+    lexer_init(&lexer, code, "test.mrt");
+    TokenArray tokens = lexer_tokenize_all(&lexer);
+    Parser parser;
+    parser_init(&parser, tokens, code, "test.mrt");
+    ASTNode *ast = parser_parse(&parser);
+    ASSERT(ast != NULL);
+
+    MrtSymbolList list;
+    mrt_symbol_list_init(&list);
+    mrt_inspect_ast(ast, &list);
+
+    ASSERT(list.count == 4);
+    ASSERT(strcmp(list.symbols[0].name, "a") == 0);
+    ASSERT(strcmp(list.symbols[0].kind, "variable") == 0);
+    ASSERT(strcmp(list.symbols[1].name, "my_func") == 0);
+    ASSERT(strcmp(list.symbols[1].kind, "task") == 0);
+    ASSERT(list.symbols[1].param_count == 2);
+    ASSERT(strcmp(list.symbols[2].name, "b") == 0);
+    ASSERT(strcmp(list.symbols[3].name, "c") == 0);
+
+    mrt_symbol_list_free(&list);
+    ast_free(ast);
+    parser_free(&parser);
+}
+
 int main(void) {
     printf("=========================================\n");
     printf("   MRT Programming Language Test Suite   \n");
@@ -511,9 +707,17 @@ int main(void) {
     RUN_TEST(test_say_statement);
     RUN_TEST(test_builtins);
     RUN_TEST(test_errors);
+    RUN_TEST(test_arrays);
+    RUN_TEST(test_maps);
+    RUN_TEST(test_each_loops);
+    RUN_TEST(test_modules_use);
+    RUN_TEST(test_assert_builtin);
+    RUN_TEST(test_formatter);
+    RUN_TEST(test_inspector);
 
     printf("=========================================\n");
     printf("All %d tests passed successfully!\n", tests_passed);
     printf("=========================================\n");
     return 0;
 }
+

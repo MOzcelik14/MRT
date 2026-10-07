@@ -1,0 +1,50 @@
+site_name: MRT Programming Language & MRT Studio
+site_url: https://github.com/mozcelik/MRT
+site_description: Documentation and Handbook for the MRT Programming Language and MRT Studio IDE.
+site_author: Murat Özçelik
+repo_url: https://github.com/mozcelik/MRT
+repo_name: mozcelik/MRT
+
+theme:
+  name: material
+  language: en
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: deep orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: deep orange
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+nav:
+  - English Handbook:
+      - 1. Introduction: docs/handbook/en/01_introduction.md
+      - 2. Installation & Tooling: docs/handbook/en/02_installation_and_tooling.md
+      - 3. Basic Syntax: docs/handbook/en/03_basic_syntax.md
+      - 4. Data Structures: docs/handbook/en/04_data_structures.md
+      - 5. Control Flow: docs/handbook/en/05_control_flow.md
+      - 6. Functions & Modules: docs/handbook/en/06_functions_and_modules.md
+      - 7. Standard Library: docs/handbook/en/07_standard_library.md
+      - 8. MRT Studio: docs/handbook/en/08_mrt_studio.md
+  - Türkçe El Kitabı:
+      - 1. Giriş: docs/handbook/tr/01_giris.md
+      - 2. Kurulum ve Araçlar: docs/handbook/tr/02_kurulum_ve_araclar.md
+      - 3. Temel Sözdizimi: docs/handbook/tr/03_temel_sozdizimi.md
+      - 4. Veri Yapıları: docs/handbook/tr/04_veri_yapilari.md
+      - 5. Kontrol Akışı: docs/handbook/tr/05_kontrol_akisi.md
+      - 6. Fonksiyonlar ve Modüller: docs/handbook/tr/06_fonksiyonlar_ve_moduller.md
+      - 7. Dahili Kütüphane: docs/handbook/tr/07_dahili_kutuphane.md
+      - 8. MRT Studio: docs/handbook/tr/08_mrt_studio.md

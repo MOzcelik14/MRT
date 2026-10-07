@@ -417,6 +417,12 @@ static void action_about(GSimpleAction *act, GVariant *param, gpointer udata) {
     gtk_window_present(GTK_WINDOW(about));
 }
 
+static void action_format_doc(GSimpleAction *act, GVariant *param, gpointer udata) {
+    (void)act; (void)param;
+    MrtWindow *win = (MrtWindow *)udata;
+    mrt_editor_manager_format_current(win->editor_mgr, win->settings ? win->settings->mrt_path : NULL);
+}
+
 static const GActionEntry win_entries[] = {
     { "new_file", action_new_file, NULL, NULL, NULL, {0} },
     { "open_file", action_open_file, NULL, NULL, NULL, {0} },
@@ -428,6 +434,7 @@ static const GActionEntry win_entries[] = {
     { "quick_open", action_quick_open, NULL, NULL, NULL, {0} },
     { "find_in_files", action_find_in_files, NULL, NULL, NULL, {0} },
     { "goto_line", action_goto_line, NULL, NULL, NULL, {0} },
+    { "format_doc", action_format_doc, NULL, NULL, NULL, {0} },
     { "command_palette", action_command_palette, NULL, NULL, NULL, {0} },
     { "run", action_run, NULL, NULL, NULL, {0} },
     { "stop", action_stop, NULL, NULL, NULL, {0} },
@@ -511,6 +518,7 @@ static GMenuModel *build_menu_model(void) {
     g_menu_append(edit_menu, _("Replace…"), "win.replace");
     g_menu_append(edit_menu, _("Find in Files…"), "win.find_in_files");
     g_menu_append(edit_menu, _("Go to Line…"), "win.goto_line");
+    g_menu_append(edit_menu, _("Format Document"), "win.format_doc");
     g_menu_append(edit_menu, _("Settings…"), "win.settings");
     g_menu_append_submenu(menubar, _("Edit"), G_MENU_MODEL(edit_menu));
 

@@ -10,7 +10,7 @@ struct MrtRunner {
     gboolean is_running;
 };
 
-static char *resolve_mrt_binary(const char *config_path) {
+char *mrt_runner_resolve_binary(const char *config_path) {
     if (config_path && *config_path) {
         if (g_path_is_absolute(config_path) && g_file_test(config_path, G_FILE_TEST_IS_EXECUTABLE)) {
             return g_strdup(config_path);
@@ -151,7 +151,7 @@ void mrt_runner_run(MrtRunner *runner, const char *file_path, const char *workin
 
     mrt_output_clear(runner->output);
 
-    char *mrt_bin = resolve_mrt_binary(runner->settings ? runner->settings->mrt_path : NULL);
+    char *mrt_bin = mrt_runner_resolve_binary(runner->settings ? runner->settings->mrt_path : NULL);
     if (!mrt_bin) {
         mrt_output_append_stderr(runner->output, "MRT interpreter was not found in PATH.\n");
         mrt_output_append_info(runner->output, "Please configure the MRT executable path in Settings or install MRT to your PATH.\n");

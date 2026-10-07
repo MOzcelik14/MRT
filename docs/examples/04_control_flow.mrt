@@ -1,0 +1,27 @@
+// docs/examples/04_control_flow.mrt
+var score = 85
+
+// Koşullar (when / otherwise)
+when score >= 90 {
+    say "Derece: A"
+} otherwise when score >= 80 {
+    say "Derece: B"
+} otherwise {
+    say "Derece: C"
+}
+
+// Döngüler: repeat
+var counter = 3
+repeat counter > 0 {
+    say "Geri sayım: " + toText(counter)
+    counter = counter - 1
+}
+
+// Koleksiyon döngüsü: each in
+say "Aralık döngüsü:"
+each n in range(1, 5) {
+    when n == 3 {
+        continue
+    }
+    say "Sayı: " + toText(n)
+}

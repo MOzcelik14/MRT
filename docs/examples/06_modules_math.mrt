@@ -1,0 +1,10 @@
+// docs/examples/06_modules_math.mrt
+task kare(x) {
+    give x * x
+}
+
+task kup(x) {
+    give x * x * x
+}
+
+var mod_adi = "Matematik Modülü"

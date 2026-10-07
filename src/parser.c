@@ -72,13 +72,14 @@ static void synchronize(Parser *parser) {
         if (previous(parser).type == TOKEN_SEMICOLON || previous(parser).type == TOKEN_NEWLINE) {
             return;
         }
-
         switch (peek(parser).type) {
             case TOKEN_TASK:
             case TOKEN_VAR:
             case TOKEN_WHEN:
             case TOKEN_OTHERWISE:
             case TOKEN_REPEAT:
+            case TOKEN_EACH:
+            case TOKEN_USE:
             case TOKEN_GIVE:
             case TOKEN_SAY:
             case TOKEN_BREAK:
@@ -128,6 +129,13 @@ static ASTNode *parse_assignment(Parser *parser) {
             int col = expr->column;
             ast_free(expr);
             return ast_new_assign(name, value, line, col);
+        } else if (expr && expr->type == AST_INDEX_GET) {
+            ASTNode *target = expr->as.index_get.target;
+            ASTNode *index = expr->as.index_get.index;
+            int line = expr->line;
+            int col = expr->column;
+            mrt_free(expr);
+            return ast_new_index_set(target, index, value, line, col);
         }
 
         report_parser_error(parser, equals, "invalid assignment target");
@@ -261,6 +269,13 @@ static ASTNode *parse_call(Parser *parser) {
     for (;;) {
         if (match(parser, TOKEN_LPAREN)) {
             expr = finish_call(parser, expr);
+        } else if (match(parser, TOKEN_LBRACKET)) {
+            Token bracket = previous(parser);
+            skip_newlines(parser);
+            ASTNode *index = parse_expression(parser);
+            skip_newlines(parser);
+            consume(parser, TOKEN_RBRACKET, "expected ']' after index");
+            expr = ast_new_index_get(expr, index, bracket.line, bracket.column);
         } else {
             break;
         }
@@ -314,8 +329,69 @@ static ASTNode *parse_primary(Parser *parser) {
         return expr;
     }
 
+    if (match(parser, TOKEN_LBRACKET)) {
+        Token tok = previous(parser);
+        ASTNode **elements = NULL;
+        size_t count = 0;
+        size_t cap = 0;
+        skip_newlines(parser);
+        if (!check(parser, TOKEN_RBRACKET)) {
+            do {
+                skip_newlines(parser);
+                if (check(parser, TOKEN_RBRACKET)) break;
+                ASTNode *elem = parse_expression(parser);
+                if (count + 1 > cap) {
+                    cap = cap < 4 ? 4 : cap * 2;
+                    elements = (ASTNode **)mrt_realloc(elements, cap * sizeof(ASTNode *));
+                }
+                elements[count++] = elem;
+                skip_newlines(parser);
+            } while (match(parser, TOKEN_COMMA));
+        }
+        skip_newlines(parser);
+        consume(parser, TOKEN_RBRACKET, "expected ']' after array elements");
+        return ast_new_array_literal(elements, count, tok.line, tok.column);
+    }
+
+    if (match(parser, TOKEN_LBRACE)) {
+        Token tok = previous(parser);
+        char **keys = NULL;
+        ASTNode **values = NULL;
+        size_t count = 0;
+        size_t cap = 0;
+        skip_newlines(parser);
+        if (!check(parser, TOKEN_RBRACE)) {
+            do {
+                skip_newlines(parser);
+                if (check(parser, TOKEN_RBRACE)) break;
+                Token key_tok = consume(parser, TOKEN_STRING, "expected string key in map");
+                char *key = key_tok.as.string_val ? mrt_strdup(key_tok.as.string_val) : mrt_strdup("");
+                skip_newlines(parser);
+                consume(parser, TOKEN_COLON, "expected ':' after map key");
+                skip_newlines(parser);
+                ASTNode *val = parse_expression(parser);
+                if (count + 1 > cap) {
+                    cap = cap < 4 ? 4 : cap * 2;
+                    keys = (char **)mrt_realloc(keys, cap * sizeof(char *));
+                    values = (ASTNode **)mrt_realloc(values, cap * sizeof(ASTNode *));
+                }
+                keys[count] = key;
+                values[count] = val;
+                count++;
+                skip_newlines(parser);
+            } while (match(parser, TOKEN_COMMA));
+        }
+        skip_newlines(parser);
+        consume(parser, TOKEN_RBRACE, "expected '}' after map entries");
+        return ast_new_map_literal(keys, values, count, tok.line, tok.column);
+    }
+
     Token tok = peek(parser);
-    report_parser_error(parser, tok, "expected expression");
+    if (tok.type == TOKEN_ERROR) {
+        report_parser_error(parser, tok, "%s", tok.lexeme ? tok.lexeme : "syntax error");
+    } else {
+        report_parser_error(parser, tok, "expected expression");
+    }
     advance(parser);
     return NULL;
 }
@@ -491,6 +567,42 @@ static ASTNode *parse_continue(Parser *parser) {
     return ast_new_continue(tok.line, tok.column);
 }
 
+static ASTNode *parse_each(Parser *parser) {
+    Token each_tok = previous(parser);
+    skip_newlines(parser);
+
+    Token var_tok = consume(parser, TOKEN_IDENTIFIER, "expected variable name after 'each'");
+    if (parser->panic_mode) return NULL;
+    char *var_name = mrt_strdup(var_tok.lexeme);
+
+    skip_newlines(parser);
+    consume(parser, TOKEN_IN, "expected 'in' after variable name in each loop");
+    skip_newlines(parser);
+
+    ASTNode *collection = parse_expression(parser);
+    skip_newlines(parser);
+
+    Token lbrace = consume(parser, TOKEN_LBRACE, "expected '{' after each collection");
+    ASTNode *body = parse_block_body(parser, lbrace.line, lbrace.column);
+
+    while (match(parser, TOKEN_NEWLINE) || match(parser, TOKEN_SEMICOLON));
+
+    return ast_new_each(var_name, collection, body, each_tok.line, each_tok.column);
+}
+
+static ASTNode *parse_use(Parser *parser) {
+    Token use_tok = previous(parser);
+    skip_newlines(parser);
+
+    Token path_tok = consume(parser, TOKEN_STRING, "expected module path string after 'use'");
+    if (parser->panic_mode) return NULL;
+
+    char *path = path_tok.as.string_val ? mrt_strdup(path_tok.as.string_val) : mrt_strdup("");
+    consume_statement_separator(parser);
+
+    return ast_new_use(path, use_tok.line, use_tok.column);
+}
+
 static ASTNode *parse_expr_statement(Parser *parser) {
     int line = peek(parser).line;
     int col = peek(parser).column;
@@ -502,6 +614,8 @@ static ASTNode *parse_expr_statement(Parser *parser) {
 static ASTNode *parse_statement(Parser *parser) {
     if (match(parser, TOKEN_WHEN)) return parse_when(parser);
     if (match(parser, TOKEN_REPEAT)) return parse_repeat(parser);
+    if (match(parser, TOKEN_EACH)) return parse_each(parser);
+    if (match(parser, TOKEN_USE)) return parse_use(parser);
     if (match(parser, TOKEN_GIVE)) return parse_give(parser);
     if (match(parser, TOKEN_SAY)) return parse_say(parser);
     if (match(parser, TOKEN_BREAK)) return parse_break(parser);

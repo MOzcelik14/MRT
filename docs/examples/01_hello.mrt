@@ -1,0 +1,3 @@
+// docs/examples/01_hello.mrt
+var greeting = "Merhaba MRT 0.2!"
+say greeting

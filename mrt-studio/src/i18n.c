@@ -46,6 +46,8 @@ static const MrtTrEntry tr_dictionary[] = {
     { "Replace", "Değiştir" },
     { "Go to Line", "Satıra Git" },
     { "Go to Line…", "Satıra Git…" },
+    { "Format Document", "Belgeyi Biçimlendir" },
+    { "Check Syntax", "Sözdizimini Denetle" },
 
     /* View Actions */
     { "Toggle Sidebar", "Kenar Çubuğunu Göster/Gizle" },

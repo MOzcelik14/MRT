@@ -3,6 +3,9 @@
 
 #include "common.h"
 
+typedef struct MrtArray MrtArray;
+typedef struct MrtMap MrtMap;
+
 struct ASTNode;
 struct Environment;
 struct Interpreter;
@@ -13,11 +16,22 @@ typedef enum {
     VAL_FLOAT,
     VAL_BOOL,
     VAL_STRING,
+    VAL_ARRAY,
+    VAL_MAP,
     VAL_FUNCTION,
     VAL_NATIVE_FN
 } ValueType;
 
 #define VAL_NULL VAL_NONE
+
+#define VALUE_NONE VAL_NONE
+#define VALUE_INT VAL_INT
+#define VALUE_FLOAT VAL_FLOAT
+#define VALUE_BOOL VAL_BOOL
+#define VALUE_STRING VAL_STRING
+#define VALUE_ARRAY VAL_ARRAY
+#define VALUE_MAP VAL_MAP
+#define VALUE_FUNCTION VAL_FUNCTION
 
 typedef struct Value Value;
 
@@ -45,6 +59,8 @@ struct Value {
         double float_val;
         bool bool_val;
         MrtString *string_val;
+        MrtArray *array_val;
+        MrtMap *map_val;
         MrtFunction *func_val;
         NativeFn native_val;
     } as;
@@ -59,6 +75,8 @@ Value value_bool(bool val);
 Value value_string(MrtString *str);
 Value value_string_from_cstr(const char *chars);
 Value value_string_from_buffer(char *chars, size_t length);
+Value value_array(MrtArray *arr);
+Value value_map(MrtMap *map);
 Value value_function(MrtFunction *fn);
 Value value_native_fn(NativeFn fn);
 

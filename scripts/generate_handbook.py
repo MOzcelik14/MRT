@@ -415,10 +415,11 @@ mrt> say toText(x) + " elma"
 mrt> exit
 """, styles))
 
-    story.append(Paragraph("Komut Satırı Bayrakları:", styles["SubSectionHeading"]))
-    story.append(Paragraph("• <code>mrt &lt;dosya.mrt&gt;</code>: Kaynak dosyayı yorumlar ve çalıştırır.", styles["BulletItem"]))
-    story.append(Paragraph("• <code>mrt --tokens &lt;dosya.mrt&gt;</code>: Sözcüksel analiz sonucundaki token akışını döker.", styles["BulletItem"]))
-    story.append(Paragraph("• <code>mrt --ast &lt;dosya.mrt&gt;</code>: Oluşturulan Soyut Sözdizim Ağacını (AST) hiyerarşik olarak yazdırır.", styles["BulletItem"]))
+    story.append(Paragraph("Komut Satırı Araçları ve Alt Komutlar (CLI Tooling):", styles["SubSectionHeading"]))
+    story.append(Paragraph("• <code>mrt run &lt;dosya.mrt&gt;</code>: Kaynak dosyayı çalıştırır.", styles["BulletItem"]))
+    story.append(Paragraph("• <code>mrt check [--diagnostics=json] &lt;dosya.mrt&gt;</code>: Çalıştırmadan sözdizimi doğrulaması yapar.", styles["BulletItem"]))
+    story.append(Paragraph("• <code>mrt fmt [--check] &lt;dosya.mrt&gt;</code>: AST tabanlı kaynak kodu otomatik biçimlendirir.", styles["BulletItem"]))
+    story.append(Paragraph("• <code>mrt inspect --symbols [--json] &lt;dosya.mrt&gt;</code>: Bildirilen sembolleri listeler.", styles["BulletItem"]))
     story.append(Paragraph("• <code>mrt --version</code>: MRT sürüm numarasını görüntüler.", styles["BulletItem"]))
     story.append(Paragraph("• <code>mrt --help</code>: Kullanım yardımını gösterir.", styles["BulletItem"]))
 
@@ -461,6 +462,8 @@ yas = yas + 1   // Değer yeniden atama
         [Paragraph("float", styles["TableCellCode"]), Paragraph("3.14, -0.05, 2.0", styles["TableCell"]), Paragraph("64-bit çift duyarlıklı kayan noktalı sayı (double).", styles["TableCell"])],
         [Paragraph("string", styles["TableCellCode"]), Paragraph('"Merhaba\\nDünya"', styles["TableCell"]), Paragraph("Dinamik boyutlu UTF-8 metin dizgisi.", styles["TableCell"])],
         [Paragraph("boolean", styles["TableCellCode"]), Paragraph("yes, no", styles["TableCell"]), Paragraph("Mantıksal doğruluk (yes) veya yanlışlık (no).", styles["TableCell"])],
+        [Paragraph("array", styles["TableCellCode"]), Paragraph("[10, 20, 30]", styles["TableCell"]), Paragraph("Dinamik boyutlu, referans sayımlı eleman dizisi.", styles["TableCell"])],
+        [Paragraph("map", styles["TableCellCode"]), Paragraph('{"ad": "Murat"}', styles["TableCell"]), Paragraph("Anahtar-değer haritası (sözlük).", styles["TableCell"])],
         [Paragraph("none", styles["TableCellCode"]), Paragraph("none", styles["TableCell"]), Paragraph("Boşluk/yokluk değeri (null/nil dengi).", styles["TableCell"])],
         [Paragraph("function", styles["TableCellCode"]), Paragraph("task kare(x) { ... }", styles["TableCell"]), Paragraph("Birinci sınıf fonksiyon/görev nesnesi.", styles["TableCell"])],
     ]
@@ -610,12 +613,29 @@ repeat sayac < 10 {
 say "Nihai Toplam: " + toText(toplam)
 """, styles))
 
+    story.append(Paragraph("Koleksiyon Döngüsü (each ... in ...):", styles["SubSectionHeading"]))
+    story.append(Paragraph(
+        "Diziler, harita anahtarları, aralıklar ve metin karakterleri üzerinde gezinmek için <code>each &lt;degisken&gt; in &lt;koleksiyon&gt;</code> sözdizimi kullanılır:",
+        styles["Body"]
+    ))
+
+    story.append(make_code_block("""// Dizi üzerinde döngü
+each meyve in ["elma", "armut", "muz"] {
+    say "Meyve: " + meyve
+}
+
+// range() ile aralık döngüsü
+each n in range(1, 5) {
+    say "Adım: " + toText(n)
+}
+""", styles))
+
     story.append(PageBreak())
 
     # =========================================================================
-    # BÖLÜM 7: GÖREVLER (TASKS / FONKSİYONLAR)
+    # BÖLÜM 7: GÖREVLER VE MODÜLLER
     # =========================================================================
-    story.append(Paragraph("7. Görevler (Tasks / Fonksiyonlar)", styles["SectionHeading"]))
+    story.append(Paragraph("7. Görevler (Tasks) ve Modül Sistemi (use)", styles["SectionHeading"]))
     story.append(HRFlowable(width="100%", thickness=1.5, color=COLOR_PRIMARY, spaceAfter=10))
 
     story.append(Paragraph(
@@ -676,6 +696,19 @@ task fib(n) {
 say "fib(10) = " + toText(fib(10))   // 55
 """, styles))
 
+    story.append(Paragraph("Modül Sistemi (use):", styles["SubSectionHeading"]))
+    story.append(Paragraph(
+        "MRT 0.2.0, başka dosyalardaki fonksiyon ve değişkenleri içe aktarmak için <code>use \"dosya.mrt\"</code> sözdizimini sağlar. "
+        "Yollar bağıl olarak çözülür, döngüsel içe aktarmalar engellenir ve her dosya yalnızca bir kez yüklenir:",
+        styles["Body"]
+    ))
+
+    story.append(make_code_block("""// matematik.mrt dosyasını içeri aktar
+use "matematik.mrt"
+
+say "Hesaplanan: " + toText(kare(5))
+""", styles))
+
     # =========================================================================
     # BÖLÜM 8: YERLEŞİK STANDART KÜTÜPHANE
     # =========================================================================
@@ -692,9 +725,9 @@ say "fib(10) = " + toText(fib(10))   // 55
             Paragraph("Standart girdiden (stdin) bir satır okur. İsteğe bağlı olarak ekrana istem mesajı basar. Dosya sonu (EOF) durumunda <code>none</code> döner.", styles["TableCell"])
         ],
         [
-            Paragraph("toNumber(değer)", styles["TableCellCode"]),
+            Paragraph("number(değer)", styles["TableCellCode"]),
             Paragraph("integer / float", styles["TableCell"]),
-            Paragraph("Metin, tam sayı, ondalık veya mantıksal değeri sayıya dönüştürür. Geçersiz metinlerde tip hatası üretir.", styles["TableCell"])
+            Paragraph("Metin, tam sayı, ondalık veya mantıksal değeri sayıya dönüştürür (alias: <code>toNumber</code>).", styles["TableCell"])
         ],
         [
             Paragraph("toText(değer)", styles["TableCellCode"]),
@@ -704,12 +737,47 @@ say "fib(10) = " + toText(fib(10))   // 55
         [
             Paragraph("typeOf(değer)", styles["TableCellCode"]),
             Paragraph("string", styles["TableCell"]),
-            Paragraph("Verilen değerin tip adını metin olarak döner: <code>\"integer\"</code>, <code>\"float\"</code>, <code>\"string\"</code>, <code>\"boolean\"</code>, <code>\"none\"</code>, <code>\"function\"</code>.", styles["TableCell"])
+            Paragraph("Verilen değerin tip adını metin olarak döner: <code>\"int\"</code>, <code>\"float\"</code>, <code>\"string\"</code>, <code>\"array\"</code>, <code>\"map\"</code> vb.", styles["TableCell"])
         ],
         [
-            Paragraph("length(metin)", styles["TableCellCode"]),
+            Paragraph("length(kol)", styles["TableCellCode"]),
             Paragraph("integer", styles["TableCell"]),
-            Paragraph("Verilen dizgenin karakter sayısını döner: <code>length(\"MRT\") -> 3</code>.", styles["TableCell"])
+            Paragraph("Metin, dizi veya haritadaki eleman/karakter sayısını döner: <code>length([1, 2, 3]) -> 3</code>.", styles["TableCell"])
+        ],
+        [
+            Paragraph("append(dizi, e)", styles["TableCellCode"]),
+            Paragraph("array", styles["TableCell"]),
+            Paragraph("Dizinin sonuna yeni bir eleman ekler ve diziyi döndürür.", styles["TableCell"])
+        ],
+        [
+            Paragraph("remove(kol, k)", styles["TableCellCode"]),
+            Paragraph("değer", styles["TableCell"]),
+            Paragraph("Diziden indeksle veya haritadan anahtarla elemanı silip çıkarılan değeri döndürür.", styles["TableCell"])
+        ],
+        [
+            Paragraph("contains(kol, o)", styles["TableCellCode"]),
+            Paragraph("boolean", styles["TableCell"]),
+            Paragraph("Dizi, harita veya metin içinde aranan öğenin varlığını sorgular (<code>yes</code> / <code>no</code>).", styles["TableCell"])
+        ],
+        [
+            Paragraph("keys(harita)", styles["TableCellCode"]),
+            Paragraph("array", styles["TableCell"]),
+            Paragraph("Haritadaki tüm anahtarları metin dizisi olarak döner.", styles["TableCell"])
+        ],
+        [
+            Paragraph("values(harita)", styles["TableCellCode"]),
+            Paragraph("array", styles["TableCell"]),
+            Paragraph("Haritadaki tüm değerleri dizi olarak döner.", styles["TableCell"])
+        ],
+        [
+            Paragraph("range(bas, son)", styles["TableCellCode"]),
+            Paragraph("array", styles["TableCell"]),
+            Paragraph("Belirtilen aralıkta tamsayı dizisi üretir: <code>range(1, 4) -> [1, 2, 3]</code>.", styles["TableCell"])
+        ],
+        [
+            Paragraph("assert(şart[, m])", styles["TableCellCode"]),
+            Paragraph("none", styles["TableCell"]),
+            Paragraph("Koşul yanlışsa RuntimeError fırlatır. Test doğrulamalarında kullanılır.", styles["TableCell"])
         ],
         [
             Paragraph("clock()", styles["TableCellCode"]),

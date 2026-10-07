@@ -1,0 +1,14 @@
+// docs/examples/05_functions.mrt
+task topla(a, b) {
+    give a + b
+}
+
+task faktoriyel(n) {
+    when n <= 1 {
+        give 1
+    }
+    give n * faktoriyel(n - 1)
+}
+
+say "3 + 7 = " + toText(topla(3, 7))
+say "5! = " + toText(faktoriyel(5))

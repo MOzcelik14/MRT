@@ -1,0 +1,15 @@
+// docs/examples/07_builtins.mrt
+var str = "MRT 0.2.0"
+say "Metin uzunluğu: " + toText(length(str))
+
+var sayi = number("42")
+assert(sayi == 42, "sayi 42 olmalıdır")
+say "Dönüştürülen sayı: " + toText(sayi)
+
+var dizi = range(10, 15)
+say "Oluşturulan aralık: " + toText(dizi)
+say "12 içeriyor mu: " + toText(contains(dizi, 12))
+
+var cikarilan = remove(dizi, 0)
+say "Çıkarılan ilk eleman: " + toText(cikarilan)
+say "Kalan dizi: " + toText(dizi)

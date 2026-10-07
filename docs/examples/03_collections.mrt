@@ -1,0 +1,18 @@
+// docs/examples/03_collections.mrt
+// Diziler (Arrays)
+var fruits = ["elma", "armut", "muz"]
+say "İlk meyve: " + fruits[0]
+fruits[1] = "kiraz"
+append(fruits, "çilek")
+say "Meyve sayısı: " + toText(length(fruits))
+
+// Haritalar (Maps)
+var user = {
+    "name": "Murat",
+    "role": "Mimar",
+    "version": "0.2.0"
+}
+say "Kullanıcı Adı: " + user["name"]
+user["role"] = "Sistem Mimarı"
+say "Kullanıcı Rolü: " + user["role"]
+say "Anahtarlar: " + toText(keys(user))

@@ -1,0 +1,2 @@
+option('build_studio', type: 'boolean', value: false, description: 'Build MRT Studio IDE')
+option('install_examples', type: 'boolean', value: true, description: 'Install example .mrt scripts')

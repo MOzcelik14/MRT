@@ -43,6 +43,9 @@ const char *token_type_name(TokenType type) {
         case TOKEN_RPAREN:        return "TOKEN_RPAREN";
         case TOKEN_LBRACE:        return "TOKEN_LBRACE";
         case TOKEN_RBRACE:        return "TOKEN_RBRACE";
+        case TOKEN_LBRACKET:      return "TOKEN_LBRACKET";
+        case TOKEN_RBRACKET:      return "TOKEN_RBRACKET";
+        case TOKEN_COLON:         return "TOKEN_COLON";
         case TOKEN_COMMA:         return "TOKEN_COMMA";
         case TOKEN_SEMICOLON:     return "TOKEN_SEMICOLON";
         case TOKEN_NEWLINE:       return "TOKEN_NEWLINE";

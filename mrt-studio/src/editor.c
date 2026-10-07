@@ -1,5 +1,6 @@
 #include "editor.h"
 #include "i18n.h"
+#include <glib/gstdio.h>
 
 struct MrtEditorManager {
     GtkNotebook *notebook;
@@ -253,7 +254,7 @@ MrtEditorManager *mrt_editor_manager_new(GtkNotebook *notebook, MrtSettings *set
 
     /* Keywords buffer for autocompletion */
     mgr->keywords_buffer = gtk_text_buffer_new(NULL);
-    const char *kw = "task var give say when otherwise repeat break continue yes no none typeOf length toText clock read toNumber";
+    const char *kw = "task var give say when otherwise repeat break continue each in use and or not yes no none typeOf length toText clock read number toNumber append remove contains keys values range assert";
     gtk_text_buffer_set_text(mgr->keywords_buffer, kw, -1);
 
     g_signal_connect(mgr->notebook, "switch-page", G_CALLBACK(on_notebook_switch_page), mgr);
@@ -744,3 +745,53 @@ void mrt_editor_manager_save_all(MrtEditorManager *mgr, GtkWindow *parent) {
         }
     }
 }
+
+void mrt_editor_manager_format_current(MrtEditorManager *mgr, const char *mrt_bin) {
+    MrtEditorTab *tab = mrt_editor_manager_get_current_tab(mgr);
+    if (!tab || !tab->buffer) return;
+
+    GtkTextIter start, end;
+    gtk_text_buffer_get_bounds(GTK_TEXT_BUFFER(tab->buffer), &start, &end);
+    char *text = gtk_text_buffer_get_text(GTK_TEXT_BUFFER(tab->buffer), &start, &end, FALSE);
+    if (!text || strlen(text) == 0) {
+        g_free(text);
+        return;
+    }
+
+    char *tmp_path = g_build_filename(g_get_tmp_dir(), "mrt_studio_fmt_tmp.mrt", NULL);
+    GError *err = NULL;
+    if (g_file_set_contents(tmp_path, text, -1, &err)) {
+        char *bin = mrt_bin ? g_strdup(mrt_bin) : NULL;
+        if (!bin && mgr->settings) {
+            bin = g_strdup(mgr->settings->mrt_path);
+        }
+        if (!bin || !*bin) {
+            g_free(bin);
+            bin = g_find_program_in_path("mrt");
+        }
+        if (!bin && g_file_test("../mrt", G_FILE_TEST_IS_EXECUTABLE)) {
+            bin = g_canonicalize_filename("../mrt", NULL);
+        }
+        if (!bin && g_file_test("./mrt", G_FILE_TEST_IS_EXECUTABLE)) {
+            bin = g_canonicalize_filename("./mrt", NULL);
+        }
+
+        if (bin) {
+            char *argv[] = { bin, "fmt", tmp_path, NULL };
+            int exit_status = 0;
+            if (g_spawn_sync(NULL, argv, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, NULL, NULL, &exit_status, NULL) && exit_status == 0) {
+                char *formatted = NULL;
+                if (g_file_get_contents(tmp_path, &formatted, NULL, NULL)) {
+                    gtk_text_buffer_set_text(GTK_TEXT_BUFFER(tab->buffer), formatted, -1);
+                    g_free(formatted);
+                }
+            }
+            g_free(bin);
+        }
+        g_unlink(tmp_path);
+    }
+    if (err) g_error_free(err);
+    g_free(tmp_path);
+    g_free(text);
+}
+

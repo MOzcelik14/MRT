@@ -90,6 +90,9 @@ static void mrt_application_startup(GApplication *gapp) {
     const char * const accels_run[] = { "F5", NULL };
     gtk_application_set_accels_for_action(app, "win.run", accels_run);
 
+    const char * const accels_format[] = { "<Shift><Alt>f", "<Ctrl><Shift>i", NULL };
+    gtk_application_set_accels_for_action(app, "win.format_doc", accels_format);
+
     const char * const accels_quit[] = { "<Ctrl>q", NULL };
     gtk_application_set_accels_for_action(app, "app.quit", accels_quit);
 }

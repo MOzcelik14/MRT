@@ -14,6 +14,7 @@ MrtRunner *mrt_runner_new(MrtOutput *output, MrtSettings *settings,
                           MrtRunnerStateCallback on_state_changed, gpointer user_data);
 void mrt_runner_free(MrtRunner *runner);
 
+char *mrt_runner_resolve_binary(const char *config_path);
 gboolean mrt_runner_is_running(MrtRunner *runner);
 void mrt_runner_run(MrtRunner *runner, const char *file_path, const char *working_dir);
 void mrt_runner_stop(MrtRunner *runner);

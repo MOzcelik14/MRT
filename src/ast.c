@@ -92,6 +92,21 @@ ASTNode *ast_new_literal_null(int line, int col) {
     return ast_new_literal_none(line, col);
 }
 
+ASTNode *ast_new_array_literal(ASTNode **elements, size_t count, int line, int col) {
+    ASTNode *node = ast_alloc_node(AST_ARRAY_LITERAL, line, col);
+    node->as.array_literal.elements = elements;
+    node->as.array_literal.count = count;
+    return node;
+}
+
+ASTNode *ast_new_map_literal(char **keys, ASTNode **values, size_t count, int line, int col) {
+    ASTNode *node = ast_alloc_node(AST_MAP_LITERAL, line, col);
+    node->as.map_literal.keys = keys;
+    node->as.map_literal.values = values;
+    node->as.map_literal.count = count;
+    return node;
+}
+
 ASTNode *ast_new_identifier(char *name, int line, int col) {
     ASTNode *node = ast_alloc_node(AST_IDENTIFIER, line, col);
     node->as.identifier.name = name;
@@ -130,6 +145,21 @@ ASTNode *ast_new_func_call(ASTNode *callee, ASTNode **args, size_t arg_count, in
     return node;
 }
 
+ASTNode *ast_new_index_get(ASTNode *target, ASTNode *index, int line, int col) {
+    ASTNode *node = ast_alloc_node(AST_INDEX_GET, line, col);
+    node->as.index_get.target = target;
+    node->as.index_get.index = index;
+    return node;
+}
+
+ASTNode *ast_new_index_set(ASTNode *target, ASTNode *index, ASTNode *value, int line, int col) {
+    ASTNode *node = ast_alloc_node(AST_INDEX_SET, line, col);
+    node->as.index_set.target = target;
+    node->as.index_set.index = index;
+    node->as.index_set.value = value;
+    return node;
+}
+
 ASTNode *ast_new_if(ASTNode *condition, ASTNode *then_branch, ASTNode *else_branch, int line, int col) {
     ASTNode *node = ast_alloc_node(AST_IF, line, col);
     node->as.if_stmt.condition = condition;
@@ -142,6 +172,14 @@ ASTNode *ast_new_while(ASTNode *condition, ASTNode *body, int line, int col) {
     ASTNode *node = ast_alloc_node(AST_WHILE, line, col);
     node->as.while_stmt.condition = condition;
     node->as.while_stmt.body = body;
+    return node;
+}
+
+ASTNode *ast_new_each(char *var_name, ASTNode *collection, ASTNode *body, int line, int col) {
+    ASTNode *node = ast_alloc_node(AST_EACH, line, col);
+    node->as.each_stmt.var_name = var_name;
+    node->as.each_stmt.collection = collection;
+    node->as.each_stmt.body = body;
     return node;
 }
 
@@ -163,6 +201,12 @@ ASTNode *ast_new_break(int line, int col) {
 
 ASTNode *ast_new_continue(int line, int col) {
     return ast_alloc_node(AST_CONTINUE, line, col);
+}
+
+ASTNode *ast_new_use(char *path, int line, int col) {
+    ASTNode *node = ast_alloc_node(AST_USE, line, col);
+    node->as.use_stmt.path = path;
+    return node;
 }
 
 ASTNode *ast_new_expr_stmt(ASTNode *expr, int line, int col) {
@@ -197,6 +241,43 @@ void ast_free(ASTNode *node) {
             if (node->as.literal.lit_type == LITERAL_STRING) {
                 mrt_free(node->as.literal.as.string_val);
             }
+            break;
+
+        case AST_ARRAY_LITERAL:
+            for (size_t i = 0; i < node->as.array_literal.count; i++) {
+                ast_free(node->as.array_literal.elements[i]);
+            }
+            mrt_free(node->as.array_literal.elements);
+            break;
+
+        case AST_MAP_LITERAL:
+            for (size_t i = 0; i < node->as.map_literal.count; i++) {
+                mrt_free(node->as.map_literal.keys[i]);
+                ast_free(node->as.map_literal.values[i]);
+            }
+            mrt_free(node->as.map_literal.keys);
+            mrt_free(node->as.map_literal.values);
+            break;
+
+        case AST_INDEX_GET:
+            ast_free(node->as.index_get.target);
+            ast_free(node->as.index_get.index);
+            break;
+
+        case AST_INDEX_SET:
+            ast_free(node->as.index_set.target);
+            ast_free(node->as.index_set.index);
+            ast_free(node->as.index_set.value);
+            break;
+
+        case AST_EACH:
+            mrt_free(node->as.each_stmt.var_name);
+            ast_free(node->as.each_stmt.collection);
+            ast_free(node->as.each_stmt.body);
+            break;
+
+        case AST_USE:
+            mrt_free(node->as.use_stmt.path);
             break;
 
         case AST_IDENTIFIER:
@@ -342,6 +423,30 @@ static void print_node_recursive(const ASTNode *node, const char *prefix, bool i
             }
             break;
 
+        case AST_ARRAY_LITERAL:
+            printf("ArrayLiteral\n");
+            print_children(node->as.array_literal.elements, node->as.array_literal.count, child_prefix);
+            break;
+
+        case AST_MAP_LITERAL:
+            printf("MapLiteral\n");
+            print_children(node->as.map_literal.values, node->as.map_literal.count, child_prefix);
+            break;
+
+        case AST_INDEX_GET: {
+            printf("IndexGet\n");
+            ASTNode *children[2] = { node->as.index_get.target, node->as.index_get.index };
+            print_children(children, 2, child_prefix);
+            break;
+        }
+
+        case AST_INDEX_SET: {
+            printf("IndexSet\n");
+            ASTNode *children[3] = { node->as.index_set.target, node->as.index_set.index, node->as.index_set.value };
+            print_children(children, 3, child_prefix);
+            break;
+        }
+
         case AST_IDENTIFIER:
             printf("Identifier(%s)\n", node->as.identifier.name);
             break;
@@ -416,6 +521,20 @@ static void print_node_recursive(const ASTNode *node, const char *prefix, bool i
             print_children(children, 2, child_prefix);
             break;
         }
+
+        case AST_EACH: {
+            printf("EachStmt(%s)\n", node->as.each_stmt.var_name);
+            ASTNode *children[2] = {
+                node->as.each_stmt.collection,
+                node->as.each_stmt.body
+            };
+            print_children(children, 2, child_prefix);
+            break;
+        }
+
+        case AST_USE:
+            printf("UseStmt(\"%s\")\n", node->as.use_stmt.path);
+            break;
 
         case AST_RETURN:
             printf("GiveStmt\n");
